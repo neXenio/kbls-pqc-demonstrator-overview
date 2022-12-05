@@ -1,1 +1,1 @@
-# Kontext und Umfang
+# Proposed Architecture
