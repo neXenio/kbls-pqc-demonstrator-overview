@@ -10,9 +10,9 @@ Auf diese Weise prüfen und zeigen wir einerseits die Funktionalität, Bedienbar
 
 ## Details
 
-* [Kontext und Umfang](./Kontext-und-Umfang.md)
-* [Vorgesehene Architektur](./Vorgesehene-Architektur.md)
-* [API Spezifikation + User Flows](API-Spezifikation+User-Flows.md)
+* [Kontext und Umfang](./01-Kontext-und-Umfang.md)
+* [Vorgesehene Architektur](./02-Vorgesehene-Architektur.md)
+* [API Spezifikation + User Flows](./03-API-Spezifikation+User-Flows.md)
 
 ## Ausblick
 
