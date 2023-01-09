@@ -26,10 +26,16 @@ Jeder Nutzer benötigt für die beschriebenen Funktionalitäten zwei Schlüsselp
 serverseitig persistiert werden. Jedes Schlüsselpaar enthält einen geheimen Schlüssel, der clientseitig verschlüsselt
 wird, damit er serverseitig nicht ausgelesen werden kann.
 
-Dieser Prozess wird auch verwendet, um alte Schlüsselpaare durch neue abzulösen. Will ein Nutzer beispielsweise ein RSA
-Schlüsselpaar durch ein EC Schlüsselpaar ablösen, wird das aktuelle Kyber-Schlüsselpaar zusammen mit dem neuen EC
-Schlüsselpaar registriert. Auf die selbe Weise können technisch auch beide Schlüsselpaare gleichzeitig abgelöst werden,
-aber einen praktischen Nutzen gibt es dafür nicht.
+Dieser Prozess wird auch verwendet, um alte Schlüsselpaare durch neue abzulösen. Will ein Nutzer beispielsweise ein RSA-Schlüsselpaar
+durch ein EC-Schlüsselpaar ablösen, wird das aktuelle Kyber-Schlüsselpaar zusammen mit dem neuen EC-Schlüsselpaar registriert.
+Zu beachten ist hierbei jedoch, dass aufgrund ihrer Natur die Schlüsselpaare jeweils nur mit der exakt gleichen Kombination
+auf der Empfängerseite kommunizieren können. Ein vollständiger Wechsel benötigt daher eine Generierung neuer Schlüssel
+aufseiten aller Kommunikationspartner. Eine einseitige Willenserklärung einen neuen Schlüssel zu verwenden kann dadurch
+jedoch abgegeben und von einzelnen, kryptographisch kompatiblen Kommunikationspartnern honoriert werden.
+
+Der genaue Prozess, wie diese Rotation im Falle einer signifikanten Verschlechterung des Schutzniveaus (etwa im Fall eines
+neuen mathematischen Durchbruchs) schnell praktisch umgesetzt werden kann, ist nicht Teil dieses Konzepts. Auf die selbe
+Weise können technisch auch beide Schlüsselpaare gleichzeitig abgelöst werden.
 
 1. Generiere Schlüsselpaare und encryption salts
 
