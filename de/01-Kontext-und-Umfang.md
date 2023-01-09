@@ -48,7 +48,8 @@ konfigurierbar: eine Einladung kann Zugriffe zum Lesen erlauben oder zum Schreib
 Der Demonstrator soll zeigen, dass die Ergebnisse aus vorangegangenen Arbeitspaketen dafür verwendet werden können, die
 Inhalte eines Boards vor Angriffen durch Quantencomputer zu schützen. Daraus leiten sich zwei konkrete Schutzziele ab:
 
-* Vertraulichkeit: der Inhalt aller Post-Its auf einem Board darf nur für authorisierte Nutzer zugänglich sein, insbesondere sollen jegliche Inhalte für den Server nicht lesbar sein (zero-knowledge encryption)
+* Vertraulichkeit: der Inhalt aller Post-Its auf einem Board darf nur für authorisierte Nutzer zugänglich sein, insbesondere
+sollen jegliche Inhalte für den Server nicht lesbar sein (zero-knowledge encryption)
 * Integrität: Veränderungen am Inhalt eines Post-Its können nur durch authorisierte Nutzer durchgeführt werden
 *
 
