@@ -37,10 +37,11 @@ hybriden Schlüsseleinigungsverfahrens erfüllt mehrere Zwecke:
 * die beste Sicherheit von zwei Verfahren über einen längeren Zeitraum zu erhalten
 
 Dies bewerkstelligt zum einen, dass die unbekannt lange Übergangsphase von klassischen zu quantenresistenten Verfahren
-abgesichert ist: während die Verwendung von RSA über die Zeit an Sicherheit verliert, gewinnt die Verwendung von Kyber
-über die Zeit an Sicherheit. Das liegt daran, dass die Sicherheit von Verfahren darauf basiert, dass keine Möglichkeit
-bekannt ist, sie zu brechen. Je länger daran geforscht wird, die Sicherheit eines Verfahrens zu brechen, ohne dass
-signifikante Angriffe bekannt werden, desto sicherer können wir in der Annahme gehen, dass dies so bleibt.
+abgesichert ist: während das RSA-Kryptosystem über die Zeit mit dem Herrannahmen von Quantencomputern an Sicherheit verliert,
+gewinnt die kryptographische Gemeinschaft Vertrauen in die Sicherheit von Kyber. Das liegt daran, dass die Sicherheit von
+Verfahren darauf basiert, dass keine Möglichkeit bekannt ist, sie zu brechen. Je länger daran geforscht wird, die Sicherheit
+eines Verfahrens zu brechen, ohne dass signifikante Angriffe bekannt werden, desto sicherer können wir in der Annahme gehen,
+dass dies so bleibt.
 
 Zum anderen sind wir durch den Wechsel auf ein hybrides Schlüsseleinigungsverfahren dazu in der Lage, eins der Verfahren
 später auszutauschen. Beispielsweise könnte sich herausstellen, dass Kyber unsicher ist, aber sich ein anderes
