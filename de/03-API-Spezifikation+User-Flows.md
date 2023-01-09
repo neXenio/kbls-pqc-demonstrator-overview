@@ -9,7 +9,8 @@ Die folgenden User Flows beschreiben, wie die API verwendet wird.
 >
 > Die Mechanismen sind so konzipiert, dass Kyber durch ein anderes quantenresistentes Verfahren ersetzt werden kann
 > (bspw. McEliece) und RSA durch ein anderes klassisches Verfahren ersetzt werden kann (bspw. eine geeignete
-> Elliptic-Curve-Variante). Technisch lässt sich auch RSA mit EC kombinieren, aber dies hat keinen praktischen Nutzen.
+> Elliptic-Curve-Variante). Technisch lässt sich auch RSA mit EC kombinieren, aber dies hat keinen praktischen Nutzen in
+> Bezug auf die Quantencomputerresistenz.
 
 ## Nutzer registrieren
 
