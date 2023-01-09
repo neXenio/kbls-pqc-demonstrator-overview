@@ -8,7 +8,6 @@ For this purpose, a so-called Board Key is created for each board, which symmetr
 
 In this way, we test and demonstrate the functionality, usability, and performance of the botan crypto library on the one hand, and the practicality of a hybrid key agreement procedure on the other.
 
-
 ## Details
 
 * [Context and Scope](./01-Context-and-Scope.md)
@@ -18,14 +17,17 @@ In this way, we test and demonstrate the functionality, usability, and performan
 ## Outlook
 
 We hope that the realization of the demonstrator will provide important insights into the following:
+
 * Performance of botan in real-time collaboration.
 * Usability of botan
 * Practicability of a hybrid key agreement procedure for crypto-agility.
 
 Beyond the described goals, we would like to achieve the following points:
+
 * Protection of other information (the title of a board, the color or position of a post-it, etc.).
 
 Building on the demonstrator, further security mechanisms can be designed and implemented in the future:
+
 * Authenticity through (hybrid) digital signatures.
 * Mechanisms to check completeness of encrypted data
 * Storing key material at the client

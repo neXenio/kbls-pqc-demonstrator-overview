@@ -17,16 +17,17 @@ Auf diese Weise prüfen und zeigen wir einerseits die Funktionalität, Bedienbar
 ## Ausblick
 
 Wir erhoffen uns durch die Realisierung des Demonstrators wichtige Einsichten in die folgenden Punkte:
+
 * Performanz von botan bei Echtzeit-Kollaboration
 * Bedienbarkeit von botan
 * Praktikabilität eines Hybriden Schlüsseleinigungsverfahrens für Krypto-Agilität
 
-
 Über die beschriebenen Ziele hinaus möchten wir gerne folgende Punkte erreichen:
+
 * Schutz weiterer Information (der Titel eines Boards, die Farbe oder Position eines Post-its, etc.)
 
-
 Aufbauend auf dem Demonstrator können zukünftig weitere Sicherheitsmechanismen konzipiert und implementiert werden:
+
 * Authentizität durch (hybride) digitale Signaturen
 * Mechanismen um Vollständigkeit der verschlüsselten Daten zu prüfen
 * Schlüsselmaterial beim Client speichern
