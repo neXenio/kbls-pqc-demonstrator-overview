@@ -1,12 +1,12 @@
 # Vorgesehene Architektur
 
-## Client-Server Modell
+## Client-Server-Modell
 
-Wir verwenden ein einfaches Client-Server Modell, wobei der Server lediglich zum Speichern und Abrufen aller notwendigen
-Informationen dient. Die Business Logik erfolgt überwiegend clientseitig, Ver- und Entschlüsselung erfolgt ausschließlich
+Wir verwenden ein einfaches Client-Server-Modell, wobei der Server lediglich zum Speichern und Abrufen aller notwendigen
+Informationen dient. Die Businesslogik erfolgt überwiegend clientseitig, Ver- und Entschlüsselung erfolgt ausschließlich
 clientseitig. Es gibt beliebig viele Clients und einen Server, über den sich die Clients austauschen.
 
-Weitere Mechanismen wie Authentifizierung und Authorisierung, Caching, Pagination und Hochverfügbarkeit können ergänzt
+Weitere Mechanismen wie Authentifizierung und Autorisierung, Caching, Pagination und Hochverfügbarkeit können ergänzt
 werden, um Zugriffsrechte feingranular zu definieren und die Performanz zu verbessern.
 
 ## Hybrides Schlüsseleinigungsverfahren
@@ -46,8 +46,8 @@ dass dies so bleibt.
 Zum anderen sind wir durch den Wechsel auf ein hybrides Schlüsseleinigungsverfahren dazu in der Lage, eins der Verfahren
 später auszutauschen. Beispielsweise könnte sich herausstellen, dass Kyber unsicher ist, aber sich ein anderes
 quantenresistentes Verfahren wie McEliece bewährt hat. Wenn wir ein hybrides Verfahren aus RSA und Kyber verwenden und
-zu dem Zeitpunkt, an dem Kyber kompromittiert wird, RSA weiterhin sicher ist, können wir Kyber austauschen gegen
-McEliece ohne Einbußen bei der Sicherheit oder technischen Machbarkeit.
+zu dem Zeitpunkt, an dem Kyber kompromittiert wird, RSA weiterhin sicher ist, können wir Kyber gegen McEliece austauschen
+ohne Einbußen bei der Sicherheit oder technischen Machbarkeit hinnehmen zu müssen.
 
 ### Ablauf
 
@@ -58,10 +58,10 @@ Der Ablauf für das vorgesehene hybride Schlüsseleinigungsverfahren ist wie fol
    * ein Schlüsselpaar für ein klassisches Verfahren, bspw. RSA
    * ein Schlüsselpaar für ein quantenresistentes Verfahren, bspw. Kyber
 2. Alice benutzt Bobs öffentliche Schlüssel, um jeweils ein Geheimnis zu generieren und verschlüsseln. Dieser
-   Mechanismus wird als Key-Encapsulation-Mechanism (KEM) bezeichnet. Alice kann darüber hinaus zusätzlich zu Bobs
+   Mechanismus wird als Key Encapsulation Mechanism (KEM) bezeichnet. Alice kann darüber hinaus zusätzlich zu Bobs
    öffentlichen Schlüsseln auch ihre geheimen Schlüssel verwenden, um Authentizität für die verschlüsselten Geheimnisse
    zu bewirken. Die verschlüsselten Werte schickt Alice an Bob. Aus den Geheimnissen leitet Alice mittels einer
-   sogenannten Key-Derivation-Function (KDF) den encryption key ab, den sie für die spätere Kommunikation mit Bob
+   sogenannten Key Derivation Function (KDF) den encryption key ab, den sie für die spätere Kommunikation mit Bob
    verwenden wird.
 3. Bob verwendet seine geheimen Schlüssel, um die verschlüsselten Geheimnisse von Alice zu entschlüsseln. Falls Alice
    die Verschlüsselung authentifiziert hat, verwendet Bob zusätzlich die öffentlichen Schlüssel von Alice. Anschließend
@@ -69,7 +69,7 @@ Der Ablauf für das vorgesehene hybride Schlüsseleinigungsverfahren ist wie fol
 
 Die untenstehende Grafik veranschaulicht diesen Prozess:
 
-![](../images/02-hybrid-encryption.png)
+![Aufblauf der hybriden Schlüsseleinigung](../images/02-hybrid-encryption.png)
 
 Quellen
 
@@ -82,17 +82,19 @@ Quellen
 ### Benötigtes Schlüsselmaterial
 
 Für das hybride Schlüsseleinigungsverfahren werden für jeden Nutzer wie oben beschrieben zwei Schlüsselpaare benötigt.
-Das Ergebnis dieses Verfahrens ist ein verschlüsselter KEK, der im Kontext von neXboard spezifisch für den Empfänger
-ist. Der KEK ist bereits ausreichend geschützt, weil dieser nur durch das Wissen der private keys ermittelt werden kann.
+Das Ergebnis dieses Verfahrens ist ein KEK, der im Kontext von neXboard spezifisch für den Empfänger ist und mit jedem Aufruf
+variiert. Der KEK ist bereits ausreichend geschützt, weil dieser nur durch das Wissen der private keys ermittelt werden kann.
 
 ### Schutzkonzept
 
-Public keys müssen nicht geschützt werden und können daher zentral beim Server gespeichert werden. Dadurch können zudem
-alle Nutzer Zugriff auf die public keys anderer Nutzer erhalten.
+Public keys müssen nicht bezüglich ihrer Vertraulichkeit geschützt werden. Ihre Integrität ist allerdings wichtig, da sie
+der zentrale Anker der Nutzeridentität sind. Da wir korrektes Verhalten des Servers voraussetzen, können diese zentral beim
+Server gespeichert werden. Dadurch können zudem alle Nutzer Zugriff auf die public keys anderer Nutzer erhalten.
 
-Private keys müssen geschützt werden. Eine Option besteht darin, die private keys lokal bei den Nutzern zu speichern.
-Für bessere Usability werden die private keys stattdessen verschlüsselt beim Server gespeichert. Der symmetrische
-Schlüssel für diese Verschlüsselung leitet sich aus dem Passwort des Nutzers sowie zusätzlicher Entropie ab. Konkret
+Private keys müssen geschützt werden. Eine Option besteht darin, die private keys lokal bei den Nutzern zu speichern. Da
+jeder Nutzer das neXboard von verschiedenen Geräten aus erreichen will, ist diese Option nicht ohne weiteres umsetzbar. Für
+bessere Usability werden die private keys stattdessen verschlüsselt beim Server gespeichert. Der symmetrische Schlüssel
+für diese Verschlüsselung leitet sich aus dem Passwort des Nutzers sowie zusätzlicher Entropie ab. Konkret
 wird hierfür folgender Prozess durchgeführt:
 
 1. `encryption_key = pbkdf2(user_password, salt)`
@@ -100,10 +102,10 @@ wird hierfür folgender Prozess durchgeführt:
 
 Bemerkungen:
 
-* Die zum Einsatz kommenden kryptographischen Funktionen sind PBKDF2, AES-256 im GCM-Mode sowie SHA-256
-* Der Wert `salt` besteht aus 16 bytes, die von einem geeigneten Zufallszahlengenerator erstellt wurden, und wird
+* Die zum Einsatz kommenden kryptographischen Funktionen sind PBKDF2, AES-256 im Galois-Counter-Modus sowie SHA-256
+* Der Wert `salt` besteht aus 16 Bytes, die von einem geeigneten Zufallszahlengenerator erstellt wurden, und wird
   gemeinsam mit `encrypted_secret_key` beim Server gespeichert
-* der Wert `sha256(public_key)` wird auf 12 bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen
+* der Wert `sha256(public_key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen
 
 ## Schutz der Post-It Inhalte im neXboard
 

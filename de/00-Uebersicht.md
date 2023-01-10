@@ -27,7 +27,7 @@ Wir erhoffen uns durch die Realisierung des Demonstrators wichtige Einsichten in
 
 * Performanz von botan bei Echtzeit-Kollaboration
 * Bedienbarkeit von botan
-* Praktikabilität eines Hybriden Schlüsseleinigungsverfahrens für Krypto-Agilität
+* Praktikabilität eines hybriden Schlüsseleinigungsverfahrens für Krypto-Agilität
 
 Über die beschriebenen Ziele hinaus möchten wir gerne folgende Punkte erreichen:
 
