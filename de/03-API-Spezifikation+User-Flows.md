@@ -154,21 +154,20 @@ id2 = sha256(rsa_public_key_user)
 
 ## Board bearbeiten
 
-Sobald ein Board erstellt oder geöffnet ist, liegt die Board ID sowie der Board key vor. Jedes erstellte Post-It erhält
-eine eindeutige ID. Jede Änderung an einem Post-It wird mit einem aktuellen Zeitstempel versehen. Aus der Post-It ID
-und dem Zeitstempel ergibt sich der IV für die Verschlüsselung des Inhalts.
+Sobald ein Board erstellt oder geöffnet ist, liegt die Board ID sowie der Board key vor. Der IV für die Verschlüsselung des
+jeweiligen Post-It-Inhalts wird zufällig vom Client bestimmt. Jedes erstellte Post-It erhält eine eindeutige ID. Jede Änderung
+an einem Post-It wird mit einem aktuellen Zeitstempel versehen.
 
 Weil sich der Board key im Laufe der Zeit ändern kann, wird zudem der Board key referenziert, mit dem der Post-It
 Inhalt verschlüsselt wurde.
 
 Änderungen können in Batches an den Server geschickt werden.
 
-1. Post-It Inhalt
-
+1. Post-It-Inhalt
 ```
 # given: board_key, postit_id, postit_content
 timestamp                = System.now()
-iv                       = sha256(postit_id, timestamp)
+iv                       = prng(12)
 encrypted_postit_content = aes256gcm.enc(postit_content, board_key, iv)
 board_key_id             = sha256(board_key)
 ```
@@ -180,13 +179,14 @@ board_key_id             = sha256(board_key)
   "objectId": "05402bfa9ff8bb20df8f29776e32c80c51b8fda88e1216b09fa54b5c9c5b3fd7",
   "timestamp": 1669823977123521245,
   "dataEncryptionMode": "AES_256_GCM",
+  "iv": "GBkdJP3GdbjAsa49",
   "ciphertext": "6Qe3UMxK7RBvr4Md9kV2+2VW2I3tsoAIaSci8nrZ/bp8HfLL4VG2zQ==",
   "boardKeyId": "cf5a8d5983625d5b3c662a843720aa387d41e8a9d8d4964d1e72a24021ce32f0"
 }
 ```
 
 3. Änderungen aggregieren und an den Server schicken
-
+<!-- https://excalidraw.com/#json=_3EmHzET-n8i9SZu4NkfL,STf7V0hUO6m9V5VXF3fhkA -->
 ![](../images/03-04-edit-board.png)
 
 ## Board öffnen
@@ -264,6 +264,7 @@ board_key_id  = sha256(board_key)
 
 5. Abrufen aller Post-It Inhalte beim Server mit anschließender Entschlüsselung
 
+<!-- https://excalidraw.com/#json=gbYiMff7SZmoBRFmvhExn,cPO0OtK_NfG8xq3sEvQ4lQ -->
 ![](../images/03-05-05-get-events.png)
 
 ```
@@ -274,7 +275,7 @@ events_encrypted_for_board_key = filter(same_board_key_id, board_events)
 
 for board_event in events_encrypted_for_board_key:
   ciphertext       = board_event.ciphertext
-  iv               = sha256(board_event.objectId, event.timestamp)
+  iv               = board_event.iv
   board_event_data = aes256gcm.dec(ciphertext, board_key, iv)
 ```
 
