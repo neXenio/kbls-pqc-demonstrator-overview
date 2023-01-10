@@ -1,7 +1,7 @@
 # API Spezifikation + User Flows
 
 Die aktuelle API-Spezifikation ist unter folgender Quelle zu finden:
-<https://github.com/neXenio/kbls-pqc-demonstrator-api>
+<https://github.com/neXenio/kbls-pqc-demonstrator-api>.
 Die folgenden User Flows beschreiben, wie die API verwendet wird.
 
 > Im Folgenden wird für hybride Schlüsselpaare der Einfachheit halber angenommen, dass sie aus einem
@@ -15,8 +15,8 @@ Die folgenden User Flows beschreiben, wie die API verwendet wird.
 ## Nutzer registrieren
 
 Am bestehenden Prozess der Nutzerregistrierung ändert sich nichts. Für die beschriebenen Funktionalitäten müssen aber
-für jeden Nutzer zwei Schlüsselpaare registriert werden. Die Verknüpfung erfolgt über die user-ID, die bei der
-Registrierung des Nutzers festgelegt wird (bspw. die E- Mail Adresse).
+für jeden Nutzer zwei Schlüsselpaare registriert werden. Die Verknüpfung erfolgt über die User-ID, die bei der
+Registrierung des Nutzers festgelegt wird (bspw. die E-Mail-Adresse).
 
 ![](../images/03-01-user-registration.png)
 
@@ -164,6 +164,7 @@ Inhalt verschlüsselt wurde.
 Änderungen können in Batches an den Server geschickt werden.
 
 1. Post-It-Inhalt
+
 ```
 # given: board_key, postit_id, postit_content
 timestamp                = System.now()
@@ -338,12 +339,6 @@ id2_target = sha256(rsa_public_key_bob)
 
 ![](../images/03-06-share-board.png)
 
-## Public Link für ein Board erstellen
-
-Public Links für ein Board zu erstellen ist technisch möglich, aber nicht zielführend, weil dies die Zweckmäßigkeit von
-End-to-End-Encryption und zero-knowledge-Encryption verletzt. Insbesondere wäre der Server befähigt, die Inhalte der
-Post-Its zu lesen, was das Schutzziel verletzt.
-
 ## Zugriffsrechte für ein Board entziehen
 
 Wenn Nutzern die Zugriffsrechte entzogen werden, müssen alle künftigen Post-It Inhalte auf eine andere Weise
@@ -421,5 +416,5 @@ TODO: image
 > Es ist möglich, dass in der Übergangszeit, also in der Zeit zwischen Schritt 1 und Schritt 9, weitere Post-It Inhalte
 > unter dem alten Board key verschlüsselt und gepostet werden. Die initiale Absicht, weitere Post-It Inhalte
 > unzugänglich zu machen, wird also erst mit etwas Verzögerung technisch durchgesetzt.
-
+>
 > Nach Schritt 9 müssen alle Clients den neuen Board key beim Server erfragen, siehe dazu den Workflow "Board öffnen".
