@@ -107,8 +107,11 @@ Bemerkungen:
 
 ## Schutz der Post-It Inhalte im neXboard
 
-Die Inhalte der Post-Its werden unter dem aktuellen Board key verschlüsselt. Jedes Post-It hat eine eindeutige ID
-`postit_id` und jede Änderung des Post-Its ist mit einem eindeutigen Zeitstempel ts versehen, die für die Ableitung
-eines IVs für die Verschlüsselung verwendet werden kann:
+Die Inhalte der Post-Its werden unter dem aktuellen Board key verschlüsselt. Dafür wird ein zufälliger 12-Byte Initialisierungsvektor
+`iv` genutzt.
 
-* `encrypted_postit_content = aes256gcm(postit_content, board_key, sha256(postit_id + ts))`
+* `iv                       = prng(12)`
+* `encrypted_postit_content = aes256gcm(postit_content, board_key, iv)`
+
+Jedes Post-It hat eine eindeutige ID `postit_id` und jede Änderung des Post-Its ist mit einem eindeutigen Zeitstempel `ts`
+versehen, welche der Server unverschlüsselt als Metadaten abspeichert.
