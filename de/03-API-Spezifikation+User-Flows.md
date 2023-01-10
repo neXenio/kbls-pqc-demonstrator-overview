@@ -165,6 +165,7 @@ Inhalt verschlüsselt wurde.
 
 1. Post-It-Inhalt
 
+<!-- TODO: Ver- und Entschlüsselung von Boardinhalten auf CTR+HMAC ändern -->
 ```
 # given: board_key, postit_id, postit_content
 timestamp                = System.now()

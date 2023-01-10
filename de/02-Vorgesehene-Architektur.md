@@ -117,3 +117,33 @@ Die Inhalte der Post-Its werden unter dem aktuellen Board key verschlüsselt. Da
 
 Jedes Post-It hat eine eindeutige ID `postit_id` und jede Änderung des Post-Its ist mit einem eindeutigen Zeitstempel `ts`
 versehen, welche der Server unverschlüsselt als Metadaten abspeichert.
+
+## Diskussion des Modus für die Verschlüsselung
+
+Seit Jahren ist bekannt, dass für die Verschlüsselung nicht nur die Vertraulichkeit, sondern auch die Integrität durch den
+eingesetzten Chiffre gewährleistet werden muss, da ansonsten in der Praxis vorkommende Entschlüsselungsorakel genügen, um
+die Verschlüsselung auszuhebeln. Daher werden gemeinhin authentisierte Verschlüsselungsmodi, etwa Galois Counter Mode (GCM),
+sogenannte AEADs genutzt.
+
+Für den Anwendungsfall des neXboards sind die herkömmlichen AEADs leider nicht ohne Abstriche nutzbar. Insbesondere hat GCM
+nicht die Eigenschaft, dass ein Ciphertext ausschließlich unter einem Schlüssel erfolgreich entschlüsselbar ist. Im Speziellen
+ist es für einen Angreifer sogar leicht zwei Schlüssel zu kreieren, die einen gemeinsamen Ciphertext jeweils zu einem potentiell
+sinnhaften Klartexte entschlüsseln. Bei einem kollaborativen Board, in welches Nutzer eigens verschlüsselte Nachrichten hochladen
+und den symmetrischen Schlüssel jeweils an die Empfänger asymmetrisch verschlüsseln, kann diese Eigenschaft offensichtlich
+schadhaft genutzt werden. Dies gilt auch trotz der nicht gänzlichen freien Wahl der symmetrischen Schlüssel durch den Einsatz
+der KEMs. Wie im [originalen Paper zu Message Franking](https://eprint.iacr.org/2017/664.pdf) beschrieben, kann eine simple
+Encrypt-Then-HMAC-Konstruktion genutzt werden, um dieses Problem zu umgehen. Eine entsprechende Konstruktion bedingt jedoch
+einen Master-Schlüssel, der zur kollisions-resistenten Ableitung zweier Unter-Schlüssel genutzt wird. Da kein "Opening" von
+Nöten ist, ist die im Paper dargelegte "multiple-opening security" nicht notwendig.
+
+Betrachten wir den Fall mit GCM erneut: Soll das Post-It unter beiden Schlüssel sinnhaft sein, muss es (da es nur einen Ciphertext
+gibt) ein sinnhaftes Klartextpaar geben, dessen bitweise Differenz exakt der bitweisen Differenz der Keystreams (GCM basiert
+auf dem CTR-Modus) entspricht. Entsprechend ist der Angriff für lange Klartexte nicht trivial. Da bei einem Angriff im Schritt
+des Lösens des GHASH-Polynoms jeweils ein Ciphertextblock gezielt gewählt werden muss, um den gemeinsamen Tag korrekt zu
+erhalten, skaliert der Angriff weiterhin umso schlechter auf mehrere Post-Its und könnte bei entsprechendem Textvolumen nicht
+praktikabel sein. Dagegen könnten durch Implementierungsentscheidungen eines Clients Post-Its mit nicht druckbaren Zeichen
+nicht angezeigt und somit der Angriff praktisch doch ermöglicht werden.
+
+Entsprechend entscheiden wir uns im neXboard bei der Verschlüsselung von Post-It-Inhalten dazu nicht den AEAD GCM zu nutzen,
+sondern verwenden stattdessen eine Encrypt-Then-HMAC-Konstruktion (CTR + HMAC). Für andere Anwendungsfälle in denen die
+Eigenschaft des Key-Commitments nicht entscheidend ist, wird hingegen GCM eingesetzt.
