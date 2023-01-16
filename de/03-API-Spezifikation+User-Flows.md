@@ -54,10 +54,12 @@ RSA:
 2. Encryption key für die geheimen Schlüssel ableiten aus dem Nutzerpasswort und encryption salts
 
 ```
-encryption key        = pbkdf2(password, encryption salt)
+encryption key        = pbkdf2(password, "encryptPrivateKeys" || encryption salt)
 iv                    = sha256(public key)
 encrypted private key = aes256gcm(private key, encryption key, iv)
 ```
+
+> Der Wert `sha256(public key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 3. Ergebnis als DTO encodieren (beispielhaft für Kyber)
 
@@ -77,15 +79,18 @@ encrypted private key = aes256gcm(private key, encryption key, iv)
 
 4. Key Pair DTOs mit user-ID aggregieren und an den Server schicken
 
-![](../images/03-02-key-pair-registration.png)
+![Registrierung der Schlüsselpaare](../images/03-02-key-pair-registration.png)
 
 > Das encryption salt für die Verschlüsselung des private keys ist aus kryptografischer Sicht an dieser Stelle
 > redundant und unpräzise benannt:
 >
-> * Der resultierende encryption key wird nur einmal verwendet. Deshalb kann der IV hier ohne Sicherheitsbedenken
->   statisch sein (bspw. nur aus 0en bestehen) und das salt für PBKDF2 aus dem public key abgeleitet werden (bspw.
->   sha256(public key)). Somit ist ein separates encryption salt nicht erforderlich.
-> * Das salt wird für PBKDF2 verwendet, nicht fürs Verschlüsseln. Das Verschlüsseln bedingt aber PBKDF2 und damit das salt.
+> * Der resultierende encryption key wird nur je einmal pro KEM-Schlüsselpaar verwendet. Deshalb kann der IV hier ohne Sicherheitsbedenken
+>   statisch je Schlüsselpaar sein und das salt für PBKDF2 aus dem public key abgeleitet werden (bspw.
+>   sha256(public key)). Somit ist ein separates encryption salt nicht technisch erforderlich.
+> * Das salt wird für PBKDF2 verwendet, nicht für die Verschlüsselung. Das Verschlüsseln bedingt aber PBKDF2 und damit das
+>   salt.
+> * Damit ein Passworthash mit PBKDF2, der in einem anderen Kontext genutzt wird, nicht zufällig dem encryption key entspricht,
+>   wird der konstante String `encryptPrivateKeys` dem salt vorangestellt.
 >
 > Wir verwenden an dieser Stelle trotzdem ein separates salt, um einerseits versehentlichen Fehlern an anderer Stelle
 > vorzubeugen und andererseits weitere Verschlüsselungsmodi ohne API-Anpassungen zu ermöglichen.
@@ -96,11 +101,11 @@ Die Erstellung eines Boards erfordert die Erstellung eines Board keys und dessen
 dieses Board erstellt, teilt das Board gewissermaßen mit sich selbst. Im oben beschriebenen hybriden
 Schlüsseleinigungsverfahren nimmt der Nutzer die Rolle von Alice und Bob ein.
 
-1. Board ID und Board Key generieren (16 zufällige Bytes)
+1. Board ID und Board Key generieren (32 zufällige Bytes)
 
 ```
 board_id  = UUID.random()
-board_key = prng(16)
+board_key = prng(32)
 ```
 
 2. Erstes Geheimnis mit Kyber erstellen und verschlüsseln
@@ -122,10 +127,12 @@ encrypted_secret2 = rsa_kem_result.encrypted_secret
 4. Board Key verschlüsseln
 
 ```
-key_encryption_key = HKDF(secret1, secret2)
+key_encryption_key = HKDF(secret1 || secret2)
 iv = sha256(board_id)
 encrypted_board_key = aes256gcm.enc(board_key, key_encryption_key, iv)
 ```
+
+> Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 5. IDs für die public keys erstellen
 
@@ -158,8 +165,8 @@ Sobald ein Board erstellt oder geöffnet ist, liegt die Board-ID sowie der Board
 jeweiligen Post-it-Inhalts wird zufällig vom Client bestimmt. Jedes erstellte Post-it erhält eine eindeutige ID. Jede Änderung
 an einem Post-it wird mit einem aktuellen Zeitstempel versehen.
 
-Weil sich der Board key im Laufe der Zeit ändern kann, wird zudem der Board key referenziert, mit dem der Post-it
-Inhalt verschlüsselt wurde.
+Weil sich der Board key im Laufe der Zeit ändern kann, wird zudem der Board key referenziert, mit dem der Post-it-Inhalt
+verschlüsselt wurde.
 
 Änderungen können in Batches an den Server geschickt werden.
 
@@ -231,6 +238,8 @@ rsa_iv              = sha256(rsa_public_key)
 rsa_private_key     = aes256gcm.dec(rsa_ciphertext, rsa_encryption_key, rsa_iv)
 ```
 
+> Die Werte `sha256(*_public_key)` werden auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
+
 3. Abrufen aller für Alice verschlüsselten Board keys beim Server, weitere Schritte exemplarisch für den ersten Board key
 
 ![](../images/03-05-03-get-boards.png)
@@ -256,10 +265,10 @@ source_rsa_public_key    = source_hybrid_public_key.pk2
 ```
 enc_kdf_input1 = board_key_encryption_data.encryptedKdfInput1
 enc_kdf_input2 = board_key_encryption_data.encryptedKdfInput2
-kdf_input1     = Kyber.decrypt(enc_kdf_input1, kyber_private_key, source_rsa_public_key)
-kdf_input2     = Kyber.decrypt(enc_kdf_input2, kyber_private_key, source_rsa_public_key)
+kdf_input1     = Kyber.decrypt(enc_kdf_input1, kyber_private_key, source_kyber_public_key)
+kdf_input2     = RSA.decrypt(enc_kdf_input2, rsa_private_key, source_rsa_public_key)
 
-encryption_key = hkdf(kdf_input1, kdf_input2)
+encryption_key = hkdf(kdf_input1 || kdf_input2)
 iv             = sha256(board_id)
 
 enc_board_key = board_key_encryption_data.encryptedBoardKey
@@ -267,7 +276,9 @@ board_key     = aes256gcm.dec(enc_board_key, encryption_key, iv)
 board_key_id  = sha256(board_key)
 ```
 
-5. Abrufen aller Post-it Inhalte beim Server mit anschließender MAC-Validierung und Entschlüsselung.
+> Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
+
+5. Abrufen aller Post-it-Inhalte beim Server mit anschließender MAC-Validierung und Entschlüsselung.
 
 <!-- https://excalidraw.com/#json=VtA_sS3ON0MswyHYhO4gO,RE1zG5GBnTNcUvPZWTDgSw -->
 ![](../images/03-05-05-get-events.png)
@@ -317,10 +328,12 @@ encrypted_secret2 = rsa_kem_result.encrypted_secret
 4. Board key verschlüsseln
 
 ```
-key_encryption_key  = HKDF(secret1, secret2)
+key_encryption_key  = HKDF(secret1 || secret2)
 iv                  = sha256(board_id)
 encrypted_board_key = aes256gcm.enc(board_key, key_encryption_key, iv)
 ```
+
+> Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 5. IDs für die public keys erstellen
 
@@ -351,14 +364,14 @@ id2_target = sha256(rsa_public_key_bob)
 
 ## Zugriffsrechte für ein Board entziehen
 
-Wenn Nutzern die Zugriffsrechte entzogen werden, müssen alle künftigen Post-it Inhalte auf eine andere Weise
+Wenn Nutzern die Zugriffsrechte entzogen werden, müssen alle künftigen Post-it-Inhalte auf eine andere Weise
 verschlüsselt werden, um das Schutzziel weiterhin zu erfüllen. Dazu wird ein neuer Board key erstellt und verteilt.
 Dieser Prozess funktioniert weitestgehend wie die Prozesse für das Erstellen und Teilen des Boards.
 
-1. Neuen Board Key generieren (16 zufällige Bytes)
+1. Neuen Board Key generieren (32 zufällige Bytes)
 
 ```
-new_board_key = prng(16)
+new_board_key = prng(32)
 ```
 
 2. Erstes Geheimnis mit Kyber erstellen
@@ -380,10 +393,12 @@ encrypted_secret2 = rsa_kem_result.encrypted_secret
 4. Board Key verschlüsseln
 
 ```
-key_encryption_key  = HKDF(secret1, secret2)
+key_encryption_key  = HKDF(secret1 || secret2)
 iv                  = sha256(board_id)
 encrypted_board_key = aes256gcm.enc(board_key, key_encryption_key, iv)
 ```
+
+> Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 5. IDs für die public keys erstellen
 
@@ -423,8 +438,8 @@ TODO: image
 > Schritt 9 stellt sicher, dass der alte Board key nicht weiterhin benutzt wird. Anschließend verhindert der Server das
 > Hinzufügen von Änderungen, die unter einem anderen Board key verschlüsselt wurden.
 >
-> Es ist möglich, dass in der Übergangszeit, also in der Zeit zwischen Schritt 1 und Schritt 9, weitere Post-it Inhalte
-> unter dem alten Board key verschlüsselt und gepostet werden. Die initiale Absicht, weitere Post-it Inhalte
+> Es ist möglich, dass in der Übergangszeit, also in der Zeit zwischen Schritt 1 und Schritt 9, weitere Post-it-Inhalte
+> unter dem alten Board key verschlüsselt und gepostet werden. Die initiale Absicht, weitere Post-it-Inhalte
 > unzugänglich zu machen, wird also erst mit etwas Verzögerung technisch durchgesetzt.
 >
 > Nach Schritt 9 müssen alle Clients den neuen Board key beim Server erfragen, siehe dazu den Workflow "Board öffnen".
