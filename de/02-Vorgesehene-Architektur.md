@@ -98,8 +98,8 @@ für diese Verschlüsselung leitet sich aus dem Passwort des Nutzers sowie zusä
 wird hierfür folgender Prozess durchgeführt:
 
 1. `encryption_key = pbkdf2(user_password, "encryptPrivateKeys" || salt)`
-2. `encrypted_pq_secret_key = aes256gcm(pq_secret_key, encryption_key, sha256(pq_public_key))`
-3. `encrypted_classic_secret_key = aes256gcm(classic_secret_key, encryption_key, sha256(classic_public_key))`
+2. `encrypted_pq_secret_key = aes256gcm.encrypt(pq_secret_key, encryption_key, sha256(pq_public_key))`
+3. `encrypted_classic_secret_key = aes256gcm.encrypt(classic_secret_key, encryption_key, sha256(classic_public_key))`
 <!--
    TODO Frage:
    In 03 ließt sich das aber nach unterschiedlichen Salts je Verfahren, was dann zu einer doppelten Berechnung
@@ -130,8 +130,8 @@ beim Auth-Server gespeicherter PBKDF2-Passworthash nicht dem encryption key ents
 Die Inhalte der Post-its werden unter dem aktuellen Board key verschlüsselt. Dafür wird ein zufälliger 12-Byte Initialisierungsvektor
 `iv` genutzt.
 
-* `iv                       = prng(12)`
-* `encrypted_postit_content = aes256gcm(postit_content, board_key, iv)`
+* `iv                       = random_bytes(12)`
+* `encrypted_postit_content = aes256gcm.encrypt(postit_content, board_key, iv)`
 
 Jedes Post-it hat eine eindeutige ID `postit_id` und jede Änderung des Post-its ist mit einem eindeutigen Zeitstempel `ts`
 versehen, welche der Server unverschlüsselt als Metadaten abspeichert.
