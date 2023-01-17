@@ -123,7 +123,7 @@ und den symmetrischen Schlüssel jeweils an die Empfänger asymmetrisch verschl�
 schadhaft genutzt werden. Dies gilt auch trotz der nicht gänzlichen freien Wahl der symmetrischen Schlüssel durch den Einsatz
 der KEMs. Wie im [originalen Paper zu Message Franking](https://eprint.iacr.org/2017/664.pdf) beschrieben, kann eine simple
 Encrypt-Then-HMAC-Konstruktion genutzt werden, um dieses Problem zu umgehen. Eine entsprechende Konstruktion bedingt jedoch
-einen Master-Schlüssel, der zur kollisions-resistenten Ableitung zweier Unter-Schlüssel genutzt wird. Da kein "Opening" 
+einen Master-Schlüssel, der zur kollisions-resistenten Ableitung zweier Unter-Schlüssel genutzt wird. Da kein "Opening"
 vonnöten ist, ist die im Paper dargelegte "multiple-opening security" nicht notwendig.
 
 Betrachten wir den Fall mit GCM erneut: Soll das Post-It unter beiden Schlüssel sinnhaft sein, muss es (da es nur einen Ciphertext
@@ -133,7 +133,7 @@ des Lösens des GHASH-Polynoms jeweils ein Ciphertextblock gezielt gewählt werd
 erhalten, skaliert der Angriff weiterhin umso schlechter auf mehrere Post-Its und könnte bei entsprechendem Textvolumen nicht
 praktikabel sein. Dagegen könnten durch Implementierungsentscheidungen eines Clients Post-Its mit nicht druckbaren Zeichen
 nicht angezeigt und somit der Angriff praktisch doch ermöglicht werden. Darüber hinaus kann ein bösartiger Nutzer direkt vor
-und nach seinem Angriff auf ein einzelnes Post-It eine Key-Rotation bewirken, wodurch in jedem Fall ein gezielter Angriff 
+und nach seinem Angriff auf ein einzelnes Post-It eine Key-Rotation bewirken, wodurch in jedem Fall ein gezielter Angriff
 möglich ist.
 
 Entsprechend entscheiden wir uns im neXboard bei der Verschlüsselung von Post-It-Inhalten dazu, nicht den AEAD GCM zu nutzen,

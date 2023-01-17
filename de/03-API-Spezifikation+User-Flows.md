@@ -18,7 +18,7 @@ Am bestehenden Prozess der Nutzerregistrierung ändert sich nichts. Für die bes
 für jeden Nutzer zwei Schlüsselpaare registriert werden. Die Verknüpfung erfolgt über die User-ID, die bei der
 Registrierung des Nutzers festgelegt wird (bspw. die E-Mail-Adresse).
 
-![](../images/03-01-user-registration.png)
+![Registrierung eines Nutzers](../images/03-01-user-registration.png)
 
 ## Schlüsselpaare registrieren
 
@@ -169,7 +169,8 @@ id2 = sha256(rsa_public_key_user)
 
 7. Board Encryption Data DTO an den Server schicken
 
-![](../images/03-03-create-board.png)
+<!-- https://excalidraw.com/#json=38wASZUZnfYZfS-CU7fbr,vsS5ibgrnu98--QbzRuJOg -->
+![Erstellung eines Boards](../images/03-03-create-board.png)
 
 ## Board bearbeiten
 
@@ -211,7 +212,7 @@ board_key_id             = sha256(board_key)
 
 3. Änderungen aggregieren und an den Server schicken
 <!-- https://excalidraw.com/#json=x04kjo7fDurdefJud1BaL,ptFPOFhUBPh734af8HsoEA -->
-![](../images/03-04-edit-board.png)
+![Bearbeitung eines Boards](../images/03-04-edit-board.png)
 
 ## Board öffnen
 
@@ -223,9 +224,9 @@ und lediglich ihre Zugangsdaten kennt.
 Um das Board zu öffnen, muss zuerst der Board Key entschlüsselt werden. Dazu sind einerseits die geheimen Schlüssel des
 Nutzers erforderlich und andererseits der verschlüsselte Board key. Alice holt sich beides vom Server:
 
-1. Abrufen vom hybriden Schlüsselpaar beim Server
+1. Abrufen der hybriden Schlüsselpaare beim Server
 
-![](../images/03-05-01-get-keys.png)
+![Abrufen der hybriden Schlüsselpaare](../images/03-05-01-get-keys.png)
 
 ```python
 user_id_alice               = "alice@acme.com"
@@ -254,7 +255,8 @@ rsa_private_key     = aes256gcm.decrypt(rsa_ciphertext, rsa_encryption_key, rsa_
 
 3. Abrufen aller für Alice verschlüsselten Board keys beim Server, weitere Schritte exemplarisch für den ersten Board key
 
-![](../images/03-05-03-get-boards.png)
+<!-- https://excalidraw.com/#json=7Fs0Y5gdtBuNnxkAH691l,sjVN6hkazAJr8MLX32IkZA -->
+![Abrufen eines Boards](../images/03-05-03-get-boards.png)
 
 ```python
 id1 = sha256(kyber_public_key)
@@ -293,7 +295,7 @@ board_key_id  = sha256(board_key)
 5. Abrufen aller Post-it-Inhalte beim Server mit anschließender MAC-Validierung und Entschlüsselung.
 
 <!-- https://excalidraw.com/#json=VtA_sS3ON0MswyHYhO4gO,RE1zG5GBnTNcUvPZWTDgSw -->
-![](../images/03-05-05-get-events.png)
+![Abrufen aller Post-it-Inhalte](../images/03-05-05-get-events.png)
 
 ```python
 board_events = request("GET", "/events/{board_id}")
@@ -372,7 +374,8 @@ id2_target = sha256(rsa_public_key_bob)
 
 7. Board Encryption Data DTO an den Server schicken
 
-![](../images/03-06-share-board.png)
+<!-- https://excalidraw.com/#json=WzorYgkbf6BKiXkjitVzJ,Gi-jFrDww1BXTYq_ddmtgg -->
+![Board mit anderen Nutzern teilen](../images/03-06-share-board.png)
 
 ## Zugriffsrechte für ein Board entziehen
 
