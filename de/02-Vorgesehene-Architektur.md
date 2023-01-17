@@ -105,8 +105,10 @@ Die Inhalte der Post-its werden unter dem aktuellen Board key verschlüsselt. Da
 * `iv                       = random_bytes(12)`
 * `encrypted_postit_content = aes256gcm.encrypt(postit_content, board_key, iv)`
 
-Jedes Post-it hat eine eindeutige ID `postit_id` und jede Änderung des Post-its ist mit einem eindeutigen Zeitstempel `ts`
-versehen, welche der Server unverschlüsselt als Metadaten abspeichert.
+Jedes Post-It hat eine eindeutige ID `postit_id` und jede Änderung des Post-its ist mit einem eindeutigen Zeitstempel `ts`
+versehen, welche der Server unverschlüsselt als Metadaten abspeichert. Um beim Prozess [Zugriffsrechte für ein Board entziehen](03-API-Spezifikation%2BUser-Flows.md#Zugriffsrechte-für-ein-Board-entziehen)
+nicht viele Daten umschlüsseln zu müssen, können mehrere Board keys parallel existieren, von denen aber nur mittels des
+neusten Inhalte verändert oder hinzugefügt werden können.
 
 ## Diskussion des Modus für die Verschlüsselung
 
