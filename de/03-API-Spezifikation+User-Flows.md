@@ -123,17 +123,17 @@ board_key = random_bytes(32)
 2. Erstes Geheimnis mit Kyber erstellen und verschlüsseln
 
 ```python
-kyber_kem_result  = Kyber.kem(kyber_private_key_user, kyber_public_key_user)
-secret1           = kyber_kem_result.secret
-encrypted_secret1 = kyber_kem_result.encrypted_secret
+kyber_kem_result     = Kyber.encapsulate(kyber_private_key_user, kyber_public_key_user)
+secret1              = kyber_kem_result.secret
+encapsulated_secret1 = kyber_kem_result.encapsulated_secret
 ```
 
 3. Zweites Geheimnis mit RSA erstellen und verschlüsseln
 
 ```python
-rsa_kem_result    = RSA.kem(rsa_private_key_user, rsa_public_key_user)
-secret2           = rsa_kem_result.secret
-encrypted_secret2 = rsa_kem_result.encrypted_secret
+rsa_kem_result       = RSA.encapsulate(rsa_private_key_user, rsa_public_key_user)
+secret2              = rsa_kem_result.secret
+encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 ```
 
 4. Board Key verschlüsseln
@@ -162,8 +162,8 @@ id2 = sha256(rsa_public_key_user)
   "target": { "id1": "59ec81ac05fdc91...", "id2": "06fafdfcc94157d..." },
   "encryptedBoardKey": "mW4mDrwpDcSvOBEDgBzN7DGKLd+FtRZViAIrDUCe3RTxNILBpv1kWQ==",
   "hybridEncryptionMode": "KYBER_768_RSA_4096",
-  "encryptedKdfInput1": "MIIE4zCBlwYJKoZIhvcNAQMBMIGJAkEA...",
-  "encryptedKdfInput2": "b5fwR9PJzjrA6TEx9ukiUXxvCSZp2h2e..."
+  "encapsulatedKdfInput1": "MIIE4zCBlwYJKoZIhvcNAQMBMIGJAkEA...",
+  "encapsulatedKdfInput2": "b5fwR9PJzjrA6TEx9ukiUXxvCSZp2h2e..."
 }
 ```
 
@@ -275,10 +275,10 @@ source_rsa_public_key    = source_hybrid_public_key.pk2
 4. Entschlüsseln des Board keys
 
 ```python
-enc_kdf_input1 = board_key_encryption_data.encryptedKdfInput1
-enc_kdf_input2 = board_key_encryption_data.encryptedKdfInput2
-kdf_input1     = Kyber.decrypt(enc_kdf_input1, kyber_private_key, source_kyber_public_key)
-kdf_input2     = RSA.decrypt(enc_kdf_input2, rsa_private_key, source_rsa_public_key)
+enc_kdf_input1 = board_key_encryption_data.encapsulatedKdfInput1
+enc_kdf_input2 = board_key_encryption_data.encapsulatedKdfInput2
+kdf_input1     = Kyber.decapsulate(enc_kdf_input1, kyber_private_key, source_kyber_public_key)
+kdf_input2     = RSA.decapsulate(enc_kdf_input2, rsa_private_key, source_rsa_public_key)
 
 encryption_key = hkdf(kdf_input1 || kdf_input2)
 iv             = sha256(board_id)
@@ -324,17 +324,17 @@ Der Prozess für Bob, das Board anschließend zu öffnen, ist der gleiche wie f�
 2. Erstes Geheimnis mit Kyber erstellen und verschlüsseln
 
 ```python
-kyber_kem_result  = Kyber.kem(kyber_private_key_alice, kyber_public_key_bob)
-secret1           = kyber_kem_result.secret
-encrypted_secret1 = kyber_kem_result.encrypted_secret
+kyber_kem_result     = Kyber.encapsulate(kyber_private_key_alice, kyber_public_key_bob)
+secret1              = kyber_kem_result.secret
+encapsulated_secret1 = kyber_kem_result.encapsulated_secret
 ```
 
 3. Zweites Geheimnis mit RSA erstellen
 
 ```python
-rsa_kem_result    = RSA.kem(rsa_private_key_alice, rsa_public_key_bob)
-secret2           = rsa_kem_result.secret
-encrypted_secret2 = rsa_kem_result.encrypted_secret
+rsa_kem_result       = RSA.encapsulate(rsa_private_key_alice, rsa_public_key_bob)
+secret2              = rsa_kem_result.secret
+encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 ```
 
 4. Board key verschlüsseln
@@ -365,8 +365,8 @@ id2_target = sha256(rsa_public_key_bob)
   "target": { "id1": "afb702e1abc4c77...", "id2": "8a885ac0dff6161..." },
   "encryptedBoardKey": "2dbDmY3h+OyV4MDNoeDC7zwb0NuIt/5UY2tIndhwD1slRSRt2QdYgA==",
   "hybridEncryptionMode": "KYBER_768_RSA_4096",
-  "encryptedKdfInput1": "YjVmd1I5UEp6anJBNlRFeDl1a2lVWHh2...",
-  "encryptedKdfInput2": "OGE4ODVhYzBkZmY2MTYxMTRiODk4NzA4..."
+  "encapsulatedKdfInput1": "YjVmd1I5UEp6anJBNlRFeDl1a2lVWHh2...",
+  "encapsulatedKdfInput2": "OGE4ODVhYzBkZmY2MTYxMTRiODk4NzA4..."
 }
 ```
 
@@ -389,17 +389,17 @@ new_board_key = random_bytes(32)
 2. Erstes Geheimnis mit Kyber erstellen
 
 ```python
-kyber_kem_result  = Kyber.kem(kyber_private_key_user, kyber_public_key_user)
-secret1           = kyber_kem_result.secret
-encrypted_secret1 = kyber_kem_result.encrypted_secret
+kyber_kem_result     = Kyber.encapsulate(kyber_private_key_user, kyber_public_key_user)
+secret1              = kyber_kem_result.secret
+encapsulated_secret1 = kyber_kem_result.encapsulated_secret
 ```
 
 3. Zweites Geheimnis mit RSA erstellen
 
 ```python
-rsa_kem_result    = RSA.kem(rsa_private_key_user, rsa_public_key_user)
-secret2           = rsa_kem_result.secret
-encrypted_secret2 = rsa_kem_result.encrypted_secret
+rsa_kem_result       = RSA.encapsulate(rsa_private_key_user, rsa_public_key_user)
+secret2              = rsa_kem_result.secret
+encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 ```
 
 4. Board Key verschlüsseln
@@ -428,8 +428,8 @@ id2 = sha256(rsa_public_key_user)
   "target": { "id1": "59ec81ac05fdc91...", "id2": "06fafdfcc94157d..." },
   "encryptedBoardKey": "mW4mDrwpDcSvOBEDgBzN7DGKLd+FtRZViAIrDUCe3RTxNILBpv1kWQ==",
   "hybridEncryptionMode": "KYBER_768_RSA_4096",
-  "encryptedKdfInput1": "MIIE4zCBlwYJKoZIhvcNAQMBMIGJAkEA...",
-  "encryptedKdfInput2": "b5fwR9PJzjrA6TEx9ukiUXxvCSZp2h2e..."
+  "encapsulatedKdfInput1": "MIIE4zCBlwYJKoZIhvcNAQMBMIGJAkEA...",
+  "encapsulatedKdfInput2": "b5fwR9PJzjrA6TEx9ukiUXxvCSZp2h2e..."
 }
 ```
 
