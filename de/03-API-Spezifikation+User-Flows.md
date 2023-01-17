@@ -39,16 +39,20 @@ Weise können technisch auch beide Schlüsselpaare gleichzeitig abgelöst werden
 
 1. Generiere Schlüsselpaare und encryption salts
 
-```yml
-KYBER:
-- public key base64: MIIFQzCBlwYJKoZIhvcNAQMBMIGJ...
-- private key base64: MIIKBQIBADCBlwYJKoZIhvcNAQM...
-- encryption salt: jv/DRgVf5WW5d5BTCyozOQ==
+```python
+# encryption salt
+encryption_salt = random_bytes(16) # e.g. jv/DRgVf5WW5d5BTCyozOQ==
 
-RSA:
-- public key base64: MIICIjANBgkqhkiG9w0BAQEFAAOC...
-- private key base64: MIIJRAIBADANBgkqhkiG9w0BAQE...
-- encryption salt: dHY/g2fGyCTRlIrgK5keng==
+
+# Kyber
+kyber_keypair = KeyGen.makeKyber()
+kyber_public_key_base64 = kyber_keypair.public # e.g. MIIFQzCBlwYJKoZIhvcNAQMBMIGJ...
+kyber_private_key_base64 = kyber_keypair.private # e.g. MIIKBQIBADCBlwYJKoZIhvcNAQM...
+
+# RSA
+rsa_keypair = KeyGen.makeRsa()
+rsa_public_key_base64 = rsa_keypair.public # e.g. MIICIjANBgkqhkiG9w0BAQEFAAOC...
+rsa_private_key_base64 = rsa_keypair.private # e.g. MIIJRAIBADANBgkqhkiG9w0BAQE...
 ```
 
 2. Encryption key für die geheimen Schlüssel ableiten aus dem Nutzerpasswort und encryption salts
