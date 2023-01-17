@@ -315,6 +315,8 @@ for board_event in events_encrypted_for_board_key:
   board_event_data   = aes256ctr.decrypt(ciphertext, encryption_key, iv)
 ```
 
+> Dieser Schritt wird für alle Board keys analog durchgeführt.
+
 ## Board mit anderen Nutzern teilen
 
 Der Prozess, ein Board mit einem anderen Nutzer zu teilen, ist im Wesentlichen der gleiche wie der Prozess, ein Board
@@ -376,6 +378,10 @@ id2_target = sha256(rsa_public_key_bob)
 
 <!-- https://excalidraw.com/#json=WzorYgkbf6BKiXkjitVzJ,Gi-jFrDww1BXTYq_ddmtgg -->
 ![Board mit anderen Nutzern teilen](../images/03-06-share-board.png)
+
+> Dieser Prozess wird für alle im Board genutzten Board keys durchgeführt. Dabei werden die Verschlüsselungen analog, aber
+> unabhängig voneinander durchgeführt. Insbesondere wird für jeden Board key ein neuer Durchlauf des KEM-Verfahrens durchgeführt.
+> Dadurch sind alle `key_encryption_key`s unterschiedlich und der IV kann statisch sein.
 
 ## Zugriffsrechte für ein Board entziehen
 
