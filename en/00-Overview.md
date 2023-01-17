@@ -2,9 +2,9 @@
 
 ## Overview
 
-In the KBLS project, cryptographic methods are developed that are robust against attacks from quantum computers. As a use case, we use the web client of neXboard. neXboard provides a solution for digital whiteboards on which users can create and edit Post-Its - collaboratively and in real time. The goal is to protect the content of the Post-Its in a quantum resistant way without limiting the interactive possibilities of the board.
+In the KBLS project, cryptographic methods are developed that are robust against attacks from quantum computers. As a use case, we use the web client of neXboard. neXboard provides a solution for digital whiteboards on which users can create and edit post-its - collaboratively and in real time. The goal is to protect the content of the post-its in a quantum resistant way without limiting the interactive possibilities of the board.
 
-For this purpose, a so-called Board Key is created for each board, which symmetrically encrypts the Post-Its. The board key itself is encrypted in such a way that it can be shared with any number of users with access rights and is quantum-resistently protected. When a user's access rights are revoked, the board key changes to protect all future content.
+For this purpose, a so-called Board Key is created for each board, which symmetrically encrypts the post-its. The board key itself is encrypted in such a way that it can be shared with any number of users with access rights and is quantum-resistently protected. When a user's access rights are revoked, the board key changes to protect all future content.
 
 In this way, we test and demonstrate the functionality, usability, and performance of the botan crypto library on the one hand, and the practicality of a hybrid key agreement procedure on the other.
 

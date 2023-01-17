@@ -17,10 +17,10 @@ botan. Darüber hinaus muss das Schlüsselmaterial, das hierfür zum Einsatz kom
 Ergebnis des hybriden Schlüsseleinigungsverfahrens ist, dass zwei Kommunikationspartner Alice und Bob Schlüsselmaterial
 ausgetauscht haben. Dieses Verfahren ist generisch konzipiert, d.h. es kann für verschiedene Use Cases verwendet werden.
 
-Im Kontext von neXboard wird dieses Schlüsselmaterial dafür verwendet, einen sogenannten Board key zu verschlüsseln. Der
-Board key wiederum wird verwendet, um die Inhalte aller Post-its im Board zu schützen. Der Board key ist also ein data
-encryption key (DEK), weil dieser Daten verschlüsselt. Das zwischen Alice und Bob ausgetauschte Schlüsselmaterial ist
-ein key encryption key (KEK), weil dieser den (data encryption) key verschlüsselt.
+Im Kontext von neXboard wird dieses Schlüsselmaterial dafür verwendet, einen sogenannten Board Key zu verschlüsseln. Der
+Board Key wiederum wird verwendet, um die Inhalte aller Post-its im Board zu schützen. Der Board Key ist also ein Data
+Encryption Key (DEK), weil dieser Daten verschlüsselt. Das zwischen Alice und Bob ausgetauschte Schlüsselmaterial ist
+ein Key Encryption Key (KEK), weil dieser den (Data Encryption) Key verschlüsselt.
 
 ### Motivation
 
@@ -47,25 +47,25 @@ Zum anderen sind wir durch den Wechsel auf ein hybrides Schlüsseleinigungsverfa
 später auszutauschen. Beispielsweise könnte sich herausstellen, dass Kyber unsicher ist, aber sich ein anderes
 quantenresistentes Verfahren wie McEliece bewährt hat. Wenn wir ein hybrides Verfahren aus RSA und Kyber verwenden und
 zu dem Zeitpunkt, an dem Kyber kompromittiert wird, RSA weiterhin sicher ist, können wir Kyber gegen McEliece austauschen
-ohne Einbußen bei der Sicherheit oder technischen Machbarkeit hinnehmen zu müssen.
+ohne Einbußen bei der (aktuellen) Sicherheit oder technischen Machbarkeit hinnehmen zu müssen.
 
 ### Ablauf
 
 Der Ablauf für das vorgesehene hybride Schlüsseleinigungsverfahren ist wie folgt:
 
 1. Zwei Kommunikationspartner Alice und Bob haben zwei Schlüsselpaare, bestehend aus einem öffentlichen Schlüssel
-   (public key) zugänglich für beide und einem geheimen Schlüssel (private key), der nur ihnen bekannt ist:
+   (public key) zugänglich für beide und einem privaten Schlüssel (private key), der nur ihnen bekannt ist:
    * ein Schlüsselpaar für ein klassisches Verfahren, bspw. RSA
    * ein Schlüsselpaar für ein quantenresistentes Verfahren, bspw. Kyber
 2. Alice benutzt Bobs öffentliche Schlüssel, um jeweils ein Geheimnis zu generieren und verschlüsseln. Dieser
    Mechanismus wird als Key Encapsulation Mechanism (KEM) bezeichnet. Alice kann darüber hinaus zusätzlich zu Bobs
-   öffentlichen Schlüsseln auch ihre geheimen Schlüssel verwenden, um Authentizität für die verschlüsselten Geheimnisse
+   öffentlichen Schlüsseln auch ihre privaten Schlüssel verwenden, um Authentizität für die verschlüsselten Geheimnisse
    zu bewirken. Die verschlüsselten Werte schickt Alice an Bob. Aus den Geheimnissen leitet Alice mittels einer
-   sogenannten Key Derivation Function (KDF) den encryption key ab, den sie für die spätere Kommunikation mit Bob
-   verwenden wird.
-3. Bob verwendet seine geheimen Schlüssel, um die verschlüsselten Geheimnisse von Alice zu entschlüsseln. Falls Alice
+   sogenannten Key Derivation Function (KDF) den geheimen Schlüssel (encryption key) ab, den sie für die spätere Kommunikation
+   mit Bob verwenden wird.
+3. Bob verwendet seine privaten Schlüssel, um die verschlüsselten Geheimnisse von Alice zu entschlüsseln. Falls Alice
    die Verschlüsselung authentifiziert hat, verwendet Bob zusätzlich die öffentlichen Schlüssel von Alice. Anschließend
-   leitet auch Bob aus den entschlüsselten Geheimnissen mittels derselben KDF den encryption key ab.
+   leitet auch Bob aus den entschlüsselten Geheimnissen mittels derselben KDF den geheimen Kommunikationsschlüssel ab.
 
 Die untenstehende Grafik veranschaulicht diesen Prozess:
 
@@ -83,31 +83,32 @@ Quellen
 
 Für das hybride Schlüsseleinigungsverfahren werden für jeden Nutzer wie oben beschrieben zwei Schlüsselpaare benötigt.
 Das Ergebnis dieses Verfahrens ist ein KEK, der im Kontext von neXboard spezifisch für den Empfänger ist und mit jedem Aufruf
-variiert. Der KEK ist bereits ausreichend geschützt, weil dieser nur durch das Wissen der private keys ermittelt werden kann.
+variiert. Der KEK ist bereits ausreichend geschützt, weil dieser nur durch das Wissen der privaten Schlüssel ermittelt werden
+kann.
 
 ### Schutzkonzept
 
-Public keys müssen nicht bezüglich ihrer Vertraulichkeit geschützt werden. Ihre Integrität ist allerdings wichtig, da sie
-der zentrale Anker der Nutzeridentität sind. Da wir korrektes Verhalten des Servers voraussetzen, können diese zentral beim
-Server gespeichert werden. Dadurch können zudem alle Nutzer Zugriff auf die public keys anderer Nutzer erhalten.
+Öffentliche Schlüssel müssen nicht bezüglich ihrer Vertraulichkeit geschützt werden. Ihre Integrität ist allerdings wichtig,
+da sie der zentrale Anker der Nutzeridentität sind. Da wir korrektes Verhalten des Servers voraussetzen, können diese zentral
+beim Server gespeichert werden. Dadurch können zudem alle Nutzer Zugriff auf die öffentlichen Schlüssel anderer Nutzer erhalten.
 
-Private keys müssen geschützt werden. Eine Option besteht darin, die private keys lokal bei den Nutzern zu speichern. Da
-jeder Nutzer das neXboard von verschiedenen Geräten aus erreichen will, ist diese Option nicht ohne weiteres umsetzbar. Für
-bessere Usability werden die private keys stattdessen verschlüsselt beim Server gespeichert. Der symmetrische Schlüssel
+Private Schlüssel müssen geschützt werden. Eine Option besteht darin, die privaten Schlüssel lokal bei den Nutzern zu speichern.
+Da jeder Nutzer das neXboard von verschiedenen Geräten aus erreichen will, ist diese Option nicht ohne weiteres umsetzbar.
+Für bessere Usability werden die privaten Schlüssel stattdessen verschlüsselt beim Server gespeichert. Der symmetrische Schlüssel
 für diese Verschlüsselung leitet sich aus dem Passwort des Nutzers sowie zusätzlicher Entropie ab. Der konkrete Prozess
 wird in der [API Spezifikation](03-API-Spezifikation%2BUser-Flows.md#Schlüsselpaare-registrieren) beschrieben.
 
 ## Schutz der Post-it-Inhalte im neXboard
 
-Die Inhalte der Post-its werden unter dem aktuellen Board key verschlüsselt. Dafür wird ein zufälliger 12-Byte Initialisierungsvektor
+Die Inhalte der Post-its werden unter dem aktuellen Board Key verschlüsselt. Dafür wird ein zufälliger 12-Byte Initialisierungsvektor
 `iv` genutzt.
 
 * `iv                       = random_bytes(12)`
 * `encrypted_postit_content = aes256gcm.encrypt(postit_content, board_key, iv)`
 
-Jedes Post-It hat eine eindeutige ID `postit_id` und jede Änderung des Post-its ist mit einem eindeutigen Zeitstempel `ts`
+Jedes Post-it hat eine eindeutige ID `postit_id` und jede Änderung des Post-its ist mit einem eindeutigen Zeitstempel `ts`
 versehen, welche der Server unverschlüsselt als Metadaten abspeichert. Um beim Prozess [Zugriffsrechte für ein Board entziehen](03-API-Spezifikation%2BUser-Flows.md#Zugriffsrechte-für-ein-Board-entziehen)
-nicht viele Daten umschlüsseln zu müssen, können mehrere Board keys parallel existieren, von denen aber nur mittels des
+nicht viele Daten umschlüsseln zu müssen, können mehrere Board Keys parallel existieren, von denen aber nur mittels des
 neusten Inhalte verändert oder hinzugefügt werden können.
 
 ## Diskussion des Modus für die Verschlüsselung

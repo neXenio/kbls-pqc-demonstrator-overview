@@ -48,11 +48,11 @@ konfigurierbar: Eine Einladung kann Zugriffe zum Lesen erlauben oder zum Schreib
 Der Demonstrator soll zeigen, dass die Ergebnisse aus vorangegangenen Arbeitspaketen dafür verwendet werden können, die
 Inhalte eines Boards vor Angriffen durch Quantencomputer zu schützen. Daraus leiten sich zwei konkrete Schutzziele ab:
 
-* Vertraulichkeit: 
-  * Der Inhalt aller Post-its auf einem Board darf nur für autorisierte Nutzer zugänglich sein
+* Vertraulichkeit:
+  * Der Inhalt aller Post-its auf einem Board darf nur für autorisierte Nutzer:innen zugänglich sein
   * Weiter sollen jegliche Inhalte für den Server nicht standardmäßig lesbar sein
-* Integrität: 
-  * Veränderungen am Inhalt eines Post-its können nur durch autorisierte Nutzer durchgeführt werden
+* Integrität:
+  * Veränderungen am Inhalt eines Post-its können nur durch autorisierte Nutzer:innen durchgeführt werden
   * Insbesondere wird nur die Integrität jedes einzelnen Post-its geschützt, nicht die des gesamten Boards
 
 Autorisierte Nutzer erhalten Zugriff auf alle Inhalte seit Erstellung eines Boards (keine backward secrecy).
@@ -65,7 +65,7 @@ dann ist das Schutzziel nicht erfüllt.
 
 ## Vereinfachende Annahmen
 
-* Server ist honest-but-curious[^1], das heißt er wird nicht aktiv versuchen die Kommunikation zu verändern, ihm wird aber
+* Server ist "honest-but-curious"[^1], das heißt er wird nicht aktiv versuchen die Kommunikation zu verändern, ihm wird aber
 nicht bezüglich der Vertraulichkeit vertraut. Insbesondere auch:
   * Integrität der Client-Applikation: Der Server liefert das Frontend unverändert aus und verändert nicht die für die Clients
   gespeicherten Daten
