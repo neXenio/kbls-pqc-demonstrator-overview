@@ -37,8 +37,8 @@ hybriden Schlüsseleinigungsverfahrens erfüllt mehrere Zwecke:
 * die beste Sicherheit von zwei Verfahren über einen längeren Zeitraum zu erhalten
 
 Dies bewerkstelligt zum einen, dass die unbekannt lange Übergangsphase von klassischen zu quantenresistenten Verfahren
-abgesichert ist: während das RSA-Kryptosystem über die Zeit mit dem Herrannahmen von Quantencomputern an Sicherheit verliert,
-gewinnt die kryptographische Gemeinschaft Vertrauen in die Sicherheit von Kyber. Das liegt daran, dass die Sicherheit von
+abgesichert ist: während das RSA-Kryptosystem über die Zeit mit dem Herannahen von Quantencomputern an Sicherheit verliert,
+gewinnt die kryptografische Gemeinschaft Vertrauen in die Sicherheit von Kyber. Das liegt daran, dass die Sicherheit von
 Verfahren darauf basiert, dass keine Möglichkeit bekannt ist, sie zu brechen. Je länger daran geforscht wird, die Sicherheit
 eines Verfahrens zu brechen, ohne dass signifikante Angriffe bekannt werden, desto sicherer können wir in der Annahme gehen,
 dass dies so bleibt.
@@ -65,7 +65,7 @@ Der Ablauf für das vorgesehene hybride Schlüsseleinigungsverfahren ist wie fol
    verwenden wird.
 3. Bob verwendet seine geheimen Schlüssel, um die verschlüsselten Geheimnisse von Alice zu entschlüsseln. Falls Alice
    die Verschlüsselung authentifiziert hat, verwendet Bob zusätzlich die öffentlichen Schlüssel von Alice. Anschließend
-   leitet auch Bob aus den entschlüsselten Geheimnissen mittels der selben KDF den encryption key ab.
+   leitet auch Bob aus den entschlüsselten Geheimnissen mittels derselben KDF den encryption key ab.
 
 Die untenstehende Grafik veranschaulicht diesen Prozess:
 
@@ -102,7 +102,8 @@ wird hierfür folgender Prozess durchgeführt:
 
 Bemerkungen:
 
-* Die zum Einsatz kommenden kryptographischen Funktionen sind PBKDF2, AES-256 im Galois-Counter-Modus sowie SHA-256
+* Die zum Einsatz kommenden kryptografischen Funktionen sind PBKDF2, AES-256 im Galois-Counter-Modus (AES-GCM) und im 
+  Counter-Modus (AES-CTR) sowie SHA-256
 * Der Wert `salt` besteht aus 16 Bytes, die von einem geeigneten Zufallszahlengenerator erstellt wurden, und wird
   gemeinsam mit `encrypted_secret_key` beim Server gespeichert
 * der Wert `sha256(public_key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen
@@ -127,14 +128,14 @@ sogenannte AEADs genutzt.
 
 Für den Anwendungsfall des neXboards sind die herkömmlichen AEADs leider nicht ohne Abstriche nutzbar. Insbesondere hat GCM
 nicht die Eigenschaft, dass ein Ciphertext ausschließlich unter einem Schlüssel erfolgreich entschlüsselbar ist. Im Speziellen
-ist es für einen Angreifer sogar leicht zwei Schlüssel zu kreieren, die einen gemeinsamen Ciphertext jeweils zu einem potentiell
-sinnhaften Klartexte entschlüsseln. Bei einem kollaborativen Board, in welches Nutzer eigens verschlüsselte Nachrichten hochladen
+ist es für einen Angreifer sogar leicht, zwei Schlüssel zu kreieren, die einen gemeinsamen Ciphertext jeweils zu einem potenziell
+sinnhaften Klartext entschlüsseln. Bei einem kollaborativen Board, in welches Nutzer eigens verschlüsselte Nachrichten hochladen
 und den symmetrischen Schlüssel jeweils an die Empfänger asymmetrisch verschlüsseln, kann diese Eigenschaft offensichtlich
 schadhaft genutzt werden. Dies gilt auch trotz der nicht gänzlichen freien Wahl der symmetrischen Schlüssel durch den Einsatz
 der KEMs. Wie im [originalen Paper zu Message Franking](https://eprint.iacr.org/2017/664.pdf) beschrieben, kann eine simple
 Encrypt-Then-HMAC-Konstruktion genutzt werden, um dieses Problem zu umgehen. Eine entsprechende Konstruktion bedingt jedoch
-einen Master-Schlüssel, der zur kollisions-resistenten Ableitung zweier Unter-Schlüssel genutzt wird. Da kein "Opening" von
-Nöten ist, ist die im Paper dargelegte "multiple-opening security" nicht notwendig.
+einen Master-Schlüssel, der zur kollisions-resistenten Ableitung zweier Unter-Schlüssel genutzt wird. Da kein "Opening" 
+vonnöten ist, ist die im Paper dargelegte "multiple-opening security" nicht notwendig.
 
 Betrachten wir den Fall mit GCM erneut: Soll das Post-It unter beiden Schlüssel sinnhaft sein, muss es (da es nur einen Ciphertext
 gibt) ein sinnhaftes Klartextpaar geben, dessen bitweise Differenz exakt der bitweisen Differenz der Keystreams (GCM basiert
@@ -142,8 +143,10 @@ auf dem CTR-Modus) entspricht. Entsprechend ist der Angriff für lange Klartexte
 des Lösens des GHASH-Polynoms jeweils ein Ciphertextblock gezielt gewählt werden muss, um den gemeinsamen Tag korrekt zu
 erhalten, skaliert der Angriff weiterhin umso schlechter auf mehrere Post-Its und könnte bei entsprechendem Textvolumen nicht
 praktikabel sein. Dagegen könnten durch Implementierungsentscheidungen eines Clients Post-Its mit nicht druckbaren Zeichen
-nicht angezeigt und somit der Angriff praktisch doch ermöglicht werden.
+nicht angezeigt und somit der Angriff praktisch doch ermöglicht werden. Darüber hinaus kann ein bösartiger Nutzer direkt vor
+und nach seinem Angriff auf ein einzelnes Post-It eine Key-Rotation bewirken, wodurch in jedem Fall ein gezielter Angriff 
+möglich ist.
 
-Entsprechend entscheiden wir uns im neXboard bei der Verschlüsselung von Post-It-Inhalten dazu nicht den AEAD GCM zu nutzen,
-sondern verwenden stattdessen eine Encrypt-Then-HMAC-Konstruktion (CTR + HMAC). Für andere Anwendungsfälle in denen die
+Entsprechend entscheiden wir uns im neXboard bei der Verschlüsselung von Post-It-Inhalten dazu, nicht den AEAD GCM zu nutzen,
+sondern verwenden stattdessen eine Encrypt-Then-HMAC-Konstruktion (CTR + HMAC). Für andere Anwendungsfälle, in denen die
 Eigenschaft des Key-Commitments nicht entscheidend ist, wird hingegen GCM eingesetzt.
