@@ -43,27 +43,26 @@ Weise können technisch auch beide Schlüsselpaare gleichzeitig abgelöst werden
 # encryption salt
 encryption_salt = random_bytes(16) # e.g. jv/DRgVf5WW5d5BTCyozOQ==
 
-
 # Kyber
-kyber_keypair = KeyGen.makeKyber()
+kyber_keypair = Kyber.gen_keypair()
 kyber_public_key_base64 = kyber_keypair.public # e.g. MIIFQzCBlwYJKoZIhvcNAQMBMIGJ...
 kyber_private_key_base64 = kyber_keypair.private # e.g. MIIKBQIBADCBlwYJKoZIhvcNAQM...
 
 # RSA
-rsa_keypair = KeyGen.makeRsa()
+rsa_keypair = RSA.gen_keypair()
 rsa_public_key_base64 = rsa_keypair.public # e.g. MIICIjANBgkqhkiG9w0BAQEFAAOC...
 rsa_private_key_base64 = rsa_keypair.private # e.g. MIIJRAIBADANBgkqhkiG9w0BAQE...
 ```
 
 2. Encryption key für die geheimen Schlüssel ableiten aus dem Nutzerpasswort und encryption salts
 
-```
-encryption key        = pbkdf2(password, "encryptPrivateKeys" || encryption salt)
+```python
+encryption_key        = pbkdf2(password, "encryptPrivateKeys" || encryption_salt)
 iv                    = sha256(public key)
-encrypted private key = aes256gcm(private key, encryption key, iv)
+encrypted_private_key = aes256gcm.encrypt(private_key, encryption_key, iv)
 ```
 
-> Der Wert `sha256(public key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
+> Der Wert `sha256(public_key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 3. Ergebnis als DTO encodieren (beispielhaft für Kyber)
 
@@ -107,14 +106,14 @@ Schlüsseleinigungsverfahren nimmt der Nutzer die Rolle von Alice und Bob ein.
 
 1. Board ID und Board Key generieren (32 zufällige Bytes)
 
-```
+```python
 board_id  = UUID.random()
-board_key = prng(32)
+board_key = random_bytes(32)
 ```
 
 2. Erstes Geheimnis mit Kyber erstellen und verschlüsseln
 
-```
+```python
 kyber_kem_result  = Kyber.kem(kyber_private_key_user, kyber_public_key_user)
 secret1           = kyber_kem_result.secret
 encrypted_secret1 = kyber_kem_result.encrypted_secret
@@ -122,7 +121,7 @@ encrypted_secret1 = kyber_kem_result.encrypted_secret
 
 3. Zweites Geheimnis mit RSA erstellen und verschlüsseln
 
-```
+```python
 rsa_kem_result    = RSA.kem(rsa_private_key_user, rsa_public_key_user)
 secret2           = rsa_kem_result.secret
 encrypted_secret2 = rsa_kem_result.encrypted_secret
@@ -130,17 +129,17 @@ encrypted_secret2 = rsa_kem_result.encrypted_secret
 
 4. Board Key verschlüsseln
 
-```
-key_encryption_key = HKDF(secret1 || secret2)
+```python
+key_encryption_key = hkdf(secret1 || secret2)
 iv = sha256(board_id)
-encrypted_board_key = aes256gcm.enc(board_key, key_encryption_key, iv)
+encrypted_board_key = aes256gcm.encrypt(board_key, key_encryption_key, iv)
 ```
 
 > Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 5. IDs für die public keys erstellen
 
-```
+```python
 id1 = sha256(kyber_public_key_user)
 id2 = sha256(rsa_public_key_user)
 ```
@@ -176,13 +175,13 @@ verschlüsselt wurde.
 
 1. Post-it-Inhalt
 
-```
+```python
 # given: board_key, postit_id, postit_content
-timestamp                = System.now()
-iv                       = prng(12)
+timestamp                = now()
+iv                       = random_bytes(12)
 encryption_key           = hkdf(board_key, "ENC")
 authentication_key       = hkdf(board_key, "AUTH")
-encrypted_postit_content = aes256ctr.enc(postit_content, encryption_key, iv)
+encrypted_postit_content = aes256ctr.encrypt(postit_content, encryption_key, iv)
 encryption_mac           = hmac(encrypted_postit_content, authentication_key)
 board_key_id             = sha256(board_key)
 ```
@@ -219,27 +218,27 @@ Nutzers erforderlich und andererseits der verschlüsselte Board key. Alice holt 
 
 ![](../images/03-05-01-get-keys.png)
 
-```
+```python
 user_id_alice               = "alice@acme.com"
-hybrid_key_pair             = GET /keys/{user_id_alice}
+hybrid_key_pair             = request("GET", "/keys/{user_id_alice}")
 encrypted_kyber_private_key = hybrid_key_pair.keyPair1.encryptedPrivateKey
 encrypted_rsa_private_key   = hybrid_key_pair.keyPair2.encryptedPrivateKey
 ```
 
 2. Entschlüsseln der geheimen Schlüssel
 
-```
+```python
 kyber_encryption_salt = encrypted_kyber_private_key.encryption_salt
 kyber_encryption_key  = pbkdf2(password, kyber_encryption_salt)
 kyber_ciphertext      = encrypted_kyber_private_key.skCiphertext
 kyber_iv              = sha256(kyber_public_key)
-kyber_private_key     = aes256gcm.dec(kyber_ciphertext, kyber_encryption_key, kyber_iv)
+kyber_private_key     = aes256gcm.decrypt(kyber_ciphertext, kyber_encryption_key, kyber_iv)
 
 rsa_encryption_salt = encrypted_rsa_private_key.encryption_salt
 rsa_encryption_key  = pbkdf2(password, rsa_encryption_salt)
 rsa_ciphertext      = encrypted_rsa_private_key.skCiphertext
 rsa_iv              = sha256(rsa_public_key)
-rsa_private_key     = aes256gcm.dec(rsa_ciphertext, rsa_encryption_key, rsa_iv)
+rsa_private_key     = aes256gcm.decrypt(rsa_ciphertext, rsa_encryption_key, rsa_iv)
 ```
 
 > Die Werte `sha256(*_public_key)` werden auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
@@ -248,25 +247,25 @@ rsa_private_key     = aes256gcm.dec(rsa_ciphertext, rsa_encryption_key, rsa_iv)
 
 ![](../images/03-05-03-get-boards.png)
 
-```
+```python
 id1 = sha256(kyber_public_key)
 id2 = sha256(rsa_public_key)
 
-all_board_key_encryption_data = GET /boards/?id1={id1}&id2={id2}
+all_board_key_encryption_data = request("GET", "/boards/?id1={id1}&id2={id2}")
 board_key_encryption_data     = all_board_key_encryption_data.encryptionDataList.[0]
 
 board_id   = board_key_encryption_data.boardId
 source_id1 = board_key_encryption_data.source.id1
 source_id2 = board_key_encryption_data.source.id2
 
-source_hybrid_public_key = GET /keys/?id1={source_id1}&id2={source_id2}
+source_hybrid_public_key = request("GET", "/keys/?id1={source_id1}&id2={source_id2}")
 source_kyber_public_key  = source_hybrid_public_key.pk1
 source_rsa_public_key    = source_hybrid_public_key.pk2
 ```
 
 4. Entschlüsseln des Board keys
 
-```
+```python
 enc_kdf_input1 = board_key_encryption_data.encryptedKdfInput1
 enc_kdf_input2 = board_key_encryption_data.encryptedKdfInput2
 kdf_input1     = Kyber.decrypt(enc_kdf_input1, kyber_private_key, source_kyber_public_key)
@@ -276,7 +275,7 @@ encryption_key = hkdf(kdf_input1 || kdf_input2)
 iv             = sha256(board_id)
 
 enc_board_key = board_key_encryption_data.encryptedBoardKey
-board_key     = aes256gcm.dec(enc_board_key, encryption_key, iv)
+board_key     = aes256gcm.decrypt(enc_board_key, encryption_key, iv)
 board_key_id  = sha256(board_key)
 ```
 
@@ -287,8 +286,8 @@ board_key_id  = sha256(board_key)
 <!-- https://excalidraw.com/#json=VtA_sS3ON0MswyHYhO4gO,RE1zG5GBnTNcUvPZWTDgSw -->
 ![](../images/03-05-05-get-events.png)
 
-```
-board_events = GET /events/{board_id}
+```python
+board_events = request("GET", "/events/{board_id}")
 
 same_board_key_id = lambda board_event: board_event.boardKeyId == board_key_id
 events_encrypted_for_board_key = filter(same_board_key_id, board_events)
@@ -302,7 +301,7 @@ for board_event in events_encrypted_for_board_key:
   hmac_validation    = constant_time_equals(mac, hmac(ciphertext, authentication_key)) 
   assert(hmac_validation)
 
-  board_event_data   = aes256ctr.dec(ciphertext, encryption_key, iv)
+  board_event_data   = aes256ctr.decrypt(ciphertext, encryption_key, iv)
 ```
 
 ## Board mit anderen Nutzern teilen
@@ -315,7 +314,7 @@ Der Prozess für Bob, das Board anschließend zu öffnen, ist der gleiche wie f�
 1. Alice kennt die Board ID und den Board Key
 2. Erstes Geheimnis mit Kyber erstellen und verschlüsseln
 
-```
+```python
 kyber_kem_result  = Kyber.kem(kyber_private_key_alice, kyber_public_key_bob)
 secret1           = kyber_kem_result.secret
 encrypted_secret1 = kyber_kem_result.encrypted_secret
@@ -323,7 +322,7 @@ encrypted_secret1 = kyber_kem_result.encrypted_secret
 
 3. Zweites Geheimnis mit RSA erstellen
 
-```
+```python
 rsa_kem_result    = RSA.kem(rsa_private_key_alice, rsa_public_key_bob)
 secret2           = rsa_kem_result.secret
 encrypted_secret2 = rsa_kem_result.encrypted_secret
@@ -331,17 +330,17 @@ encrypted_secret2 = rsa_kem_result.encrypted_secret
 
 4. Board key verschlüsseln
 
-```
-key_encryption_key  = HKDF(secret1 || secret2)
+```python
+key_encryption_key  = hkdf(secret1 || secret2)
 iv                  = sha256(board_id)
-encrypted_board_key = aes256gcm.enc(board_key, key_encryption_key, iv)
+encrypted_board_key = aes256gcm.encrypt(board_key, key_encryption_key, iv)
 ```
 
 > Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 5. IDs für die public keys erstellen
 
-```
+```python
 id1_source = sha256(kyber_public_key_alice)
 id2_source = sha256(rsa_public_key_alice)
 id1_target = sha256(kyber_public_key_bob)
@@ -374,13 +373,13 @@ Dieser Prozess funktioniert weitestgehend wie die Prozesse für das Erstellen un
 
 1. Neuen Board Key generieren (32 zufällige Bytes)
 
-```
-new_board_key = prng(32)
+```python
+new_board_key = random_bytes(32)
 ```
 
 2. Erstes Geheimnis mit Kyber erstellen
 
-```
+```python
 kyber_kem_result  = Kyber.kem(kyber_private_key_user, kyber_public_key_user)
 secret1           = kyber_kem_result.secret
 encrypted_secret1 = kyber_kem_result.encrypted_secret
@@ -388,7 +387,7 @@ encrypted_secret1 = kyber_kem_result.encrypted_secret
 
 3. Zweites Geheimnis mit RSA erstellen
 
-```
+```python
 rsa_kem_result    = RSA.kem(rsa_private_key_user, rsa_public_key_user)
 secret2           = rsa_kem_result.secret
 encrypted_secret2 = rsa_kem_result.encrypted_secret
@@ -396,17 +395,17 @@ encrypted_secret2 = rsa_kem_result.encrypted_secret
 
 4. Board Key verschlüsseln
 
-```
+```python
 key_encryption_key  = HKDF(secret1 || secret2)
 iv                  = sha256(board_id)
-encrypted_board_key = aes256gcm.enc(board_key, key_encryption_key, iv)
+encrypted_board_key = aes256gcm.encrypt(board_key, key_encryption_key, iv)
 ```
 
 > Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 5. IDs für die public keys erstellen
 
-```
+```python
 id1 = sha256(kyber_public_key_user)
 id2 = sha256(rsa_public_key_user)
 ```
