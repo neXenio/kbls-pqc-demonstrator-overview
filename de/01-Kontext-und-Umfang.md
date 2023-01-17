@@ -72,7 +72,7 @@ nicht bezüglich der Vertraulichkeit vertraut. Insbesondere auch:
   gespeicherten Daten
   * Vollständigkeit: Dem Server wird vertraut, keine Post-Its zu unterschlagen
 * Verfügbarkeit: der neXboard-Server ist hochverfügbar
-* Sicherheit kryptographischer Primitive: AES-256, SHA-256 und Kyber sind bis zu einem ausreichenden Sicherheitslevel quantenresistent
+* Sicherheit kryptografischer Primitive: AES-256, SHA-256 und Kyber sind bis zu einem ausreichenden Sicherheitslevel quantenresistent
 
 [^1]: Bezüglich allen Daten außer dem Passwort. Aufgrund des bisherigen Aufbaus von neXboard müssen sich Nutzer
 mit Nutzername und Passwort am Server anmelden. Im beschriebenen System nimmt das Passwort aber auch eine sicherheitskritische

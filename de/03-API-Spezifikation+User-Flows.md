@@ -31,7 +31,7 @@ durch ein EC-Schlüsselpaar ablösen, wird das aktuelle Kyber-Schlüsselpaar zus
 Zu beachten ist hierbei jedoch, dass aufgrund ihrer Natur die Schlüsselpaare jeweils nur mit der exakt gleichen Kombination
 auf der Empfängerseite kommunizieren können. Ein vollständiger Wechsel benötigt daher eine Generierung neuer Schlüssel
 aufseiten aller Kommunikationspartner. Eine einseitige Willenserklärung einen neuen Schlüssel zu verwenden kann dadurch
-jedoch abgegeben und von einzelnen, kryptographisch kompatiblen Kommunikationspartnern honoriert werden.
+jedoch abgegeben und von einzelnen, kryptografisch kompatiblen Kommunikationspartnern honoriert werden.
 
 Der genaue Prozess, wie diese Rotation im Falle einer signifikanten Verschlechterung des Schutzniveaus (etwa im Fall eines
 neuen mathematischen Durchbruchs) schnell praktisch umgesetzt werden kann, ist nicht Teil dieses Konzepts. Auf die selbe
@@ -79,7 +79,7 @@ encrypted private key = aes256gcm(private key, encryption key, iv)
 
 ![](../images/03-02-key-pair-registration.png)
 
-> Das encryption salt für die Verschlüsselung des private keys ist aus kryptographischer Sicht an dieser Stelle
+> Das encryption salt für die Verschlüsselung des private keys ist aus kryptografischer Sicht an dieser Stelle
 > redundant und unpräzise benannt:
 >
 > * Der resultierende encryption key wird nur einmal verwendet. Deshalb kann der IV hier ohne Sicherheitsbedenken
