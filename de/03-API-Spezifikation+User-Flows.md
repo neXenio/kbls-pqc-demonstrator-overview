@@ -15,7 +15,7 @@ Die folgenden User Flows beschreiben, wie die API verwendet wird.
 ## Nutzer registrieren
 
 Am bestehenden Prozess der Nutzerregistrierung ändert sich nichts. Für die beschriebenen Funktionalitäten müssen aber
-für jeden Nutzer zwei Schlüsselpaare registriert werden. Die Verknüpfung erfolgt über die User-ID, die bei der
+für jeden Nutzer zwei Schlüsselpaare registriert werden. Die Verknüpfung erfolgt über die User ID, die bei der
 Registrierung des Nutzers festgelegt wird (bspw. die E-Mail-Adresse).
 
 ![Registrierung eines Nutzers](../images/03-01-user-registration.png)
@@ -23,7 +23,7 @@ Registrierung des Nutzers festgelegt wird (bspw. die E-Mail-Adresse).
 ## Schlüsselpaare registrieren
 
 Jeder Nutzer benötigt für die beschriebenen Funktionalitäten zwei Schlüsselpaare, die clientseitig generiert und
-serverseitig persistiert werden. Jedes Schlüsselpaar enthält einen geheimen Schlüssel, der clientseitig verschlüsselt
+serverseitig persistiert werden. Jedes Schlüsselpaar enthält einen privaten Schlüssel, der clientseitig verschlüsselt
 wird, damit er serverseitig nicht ausgelesen werden kann.
 
 Dieser Prozess wird auch verwendet, um alte Schlüsselpaare durch neue abzulösen. Will ein Nutzer beispielsweise ein RSA-Schlüsselpaar
@@ -37,7 +37,7 @@ Der genaue Prozess, wie diese Rotation im Falle einer signifikanten Verschlechte
 neuen mathematischen Durchbruchs) schnell praktisch umgesetzt werden kann, ist nicht Teil dieses Konzepts. Auf die selbe
 Weise können technisch auch beide Schlüsselpaare gleichzeitig abgelöst werden.
 
-1. Generiere Schlüsselpaare und encryption salts
+1. Generiere Schlüsselpaare und Salts für die Schlüsselableitung
 
 ```python
 # Kyber
@@ -89,7 +89,7 @@ Bemerkungen:
 }
 ```
 
-4. Key Pair DTOs mit user-ID aggregieren und an den Server schicken
+4. Key Pair DTOs mit User ID aggregieren und an den Server schicken
 
 ![Registrierung der Schlüsselpaare](../images/03-02-key-pair-registration.png)
 
@@ -109,11 +109,11 @@ Bemerkungen:
 
 ## Board erstellen
 
-Die Erstellung eines Boards erfordert die Erstellung eines Board keys und dessen Verschlüsselung. Der Nutzer, der
+Die Erstellung eines Boards erfordert die Erstellung eines Board Keys und dessen Verschlüsselung. Der Nutzer, der
 dieses Board erstellt, teilt das Board gewissermaßen mit sich selbst. Im oben beschriebenen hybriden
 Schlüsseleinigungsverfahren nimmt der Nutzer die Rolle von Alice und Bob ein.
 
-1. Board ID und Board Key generieren (32 zufällige Bytes)
+1. Board ID (UUID Version 4) und Board Key generieren (32 zufällige Bytes)
 
 ```python
 board_id  = UUID.random()
@@ -146,7 +146,7 @@ encrypted_board_key = aes256gcm.encrypt(board_key, key_encryption_key, iv)
 
 > Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
-5. IDs für die public keys erstellen
+5. IDs für die öffentlichen Schlüssel erstellen
 
 ```python
 id1 = sha256(kyber_public_key_user)
@@ -174,11 +174,11 @@ id2 = sha256(rsa_public_key_user)
 
 ## Board bearbeiten
 
-Sobald ein Board erstellt oder geöffnet ist, liegt die Board-ID sowie der Board key vor. Der IV für die Verschlüsselung des
+Sobald ein Board erstellt oder geöffnet ist, liegt die Board ID sowie der Board Key vor. Der IV für die Verschlüsselung des
 jeweiligen Post-it-Inhalts wird zufällig vom Client bestimmt. Jedes erstellte Post-it erhält eine eindeutige ID. Jede Änderung
 an einem Post-it wird mit einem aktuellen Zeitstempel versehen.
 
-Weil sich der Board key im Laufe der Zeit ändern kann, wird zudem der Board key referenziert, mit dem der Post-it-Inhalt
+Weil sich der Board Key im Laufe der Zeit ändern kann, wird zudem der Board Key referenziert, mit dem der Post-it-Inhalt
 verschlüsselt wurde.
 
 Änderungen können in Batches an den Server geschickt werden.
@@ -221,8 +221,8 @@ Wir nehmen der Einfachheit halber an, Alice hat das Board selber erstellt und da
 Zur besseren Veranschaulichung dieses Prozesses nehmen wir zudem an, dass Alice den Client seitdem neu gestartet hat
 und lediglich ihre Zugangsdaten kennt.
 
-Um das Board zu öffnen, muss zuerst der Board Key entschlüsselt werden. Dazu sind einerseits die geheimen Schlüssel des
-Nutzers erforderlich und andererseits der verschlüsselte Board key. Alice holt sich beides vom Server:
+Um das Board zu öffnen, muss zuerst der Board Key entschlüsselt werden. Dazu sind einerseits die privaten Schlüssel des
+Nutzers erforderlich und andererseits der verschlüsselte Board Key. Alice holt sich beides vom Server:
 
 1. Abrufen der hybriden Schlüsselpaare beim Server
 
@@ -235,7 +235,7 @@ encrypted_kyber_private_key = hybrid_key_pair.keyPair1.encryptedPrivateKey
 encrypted_rsa_private_key   = hybrid_key_pair.keyPair2.encryptedPrivateKey
 ```
 
-2. Entschlüsseln der geheimen Schlüssel
+2. Entschlüsseln der privaten Schlüssel
 
 ```python
 kyber_encryption_salt = encrypted_kyber_private_key.encryption_salt
@@ -253,7 +253,7 @@ rsa_private_key     = aes256gcm.decrypt(rsa_ciphertext, rsa_encryption_key, rsa_
 
 > Die Werte `sha256(*_public_key)` werden auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
-3. Abrufen aller für Alice verschlüsselten Board keys beim Server, weitere Schritte exemplarisch für den ersten Board key
+3. Abrufen aller für Alice verschlüsselten Board Keys beim Server, weitere Schritte exemplarisch für den ersten Board Key
 
 <!-- https://excalidraw.com/#json=7Fs0Y5gdtBuNnxkAH691l,sjVN6hkazAJr8MLX32IkZA -->
 ![Abrufen eines Boards](../images/03-05-03-get-boards.png)
@@ -274,7 +274,7 @@ source_kyber_public_key  = source_hybrid_public_key.pk1
 source_rsa_public_key    = source_hybrid_public_key.pk2
 ```
 
-4. Entschlüsseln des Board keys
+4. Entschlüsseln des Board Keys
 
 ```python
 enc_kdf_input1 = board_key_encryption_data.encapsulatedKdfInput1
@@ -292,7 +292,7 @@ board_key_id  = sha256(board_key)
 
 > Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
-5. Abrufen aller Post-it-Inhalte beim Server mit anschließender MAC-Validierung und Entschlüsselung.
+5. Abrufen aller Post-it-Inhalte beim Server mit anschließender MAC-Validierung und Entschlüsselung
 
 <!-- https://excalidraw.com/#json=VtA_sS3ON0MswyHYhO4gO,RE1zG5GBnTNcUvPZWTDgSw -->
 ![Abrufen aller Post-it-Inhalte](../images/03-05-05-get-events.png)
@@ -315,7 +315,7 @@ for board_event in events_encrypted_for_board_key:
   board_event_data   = aes256ctr.decrypt(ciphertext, encryption_key, iv)
 ```
 
-> Dieser Schritt wird für alle Board keys analog durchgeführt.
+> Dieser Schritt wird für alle Board Keys analog durchgeführt.
 
 ## Board mit anderen Nutzern teilen
 
@@ -341,7 +341,7 @@ secret2              = rsa_kem_result.secret
 encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 ```
 
-4. Board key verschlüsseln
+4. Board Key verschlüsseln
 
 ```python
 key_encryption_key  = hkdf(secret1 || secret2)
@@ -351,7 +351,7 @@ encrypted_board_key = aes256gcm.encrypt(board_key, key_encryption_key, iv)
 
 > Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
-5. IDs für die public keys erstellen
+5. IDs für die öffentlichen Schlüssel erstellen
 
 ```python
 id1_source = sha256(kyber_public_key_alice)
@@ -379,14 +379,14 @@ id2_target = sha256(rsa_public_key_bob)
 <!-- https://excalidraw.com/#json=WzorYgkbf6BKiXkjitVzJ,Gi-jFrDww1BXTYq_ddmtgg -->
 ![Board mit anderen Nutzern teilen](../images/03-06-share-board.png)
 
-> Dieser Prozess wird für alle im Board genutzten Board keys durchgeführt. Dabei werden die Verschlüsselungen analog, aber
-> unabhängig voneinander durchgeführt. Insbesondere wird für jeden Board key ein neuer Durchlauf des KEM-Verfahrens durchgeführt.
+> Dieser Prozess wird für alle im Board genutzten Board Keys durchgeführt. Dabei werden die Verschlüsselungen analog, aber
+> unabhängig voneinander durchgeführt. Insbesondere wird für jeden Board Key ein neuer Durchlauf des KEM-Verfahrens durchgeführt.
 > Dadurch sind alle `key_encryption_key`s unterschiedlich und der IV kann statisch sein.
 
 ## Zugriffsrechte für ein Board entziehen
 
 Wenn Nutzern die Zugriffsrechte entzogen werden, müssen alle künftigen Post-it-Inhalte auf eine andere Weise
-verschlüsselt werden, um das Schutzziel weiterhin zu erfüllen. Dazu wird ein neuer Board key erstellt und verteilt.
+verschlüsselt werden, um das Schutzziel weiterhin zu erfüllen. Dazu wird ein neuer Board Key erstellt und verteilt.
 Dieser Prozess funktioniert weitestgehend wie die Prozesse für das Erstellen und Teilen des Boards.
 
 1. Neuen Board Key generieren (32 zufällige Bytes)
@@ -421,7 +421,7 @@ encrypted_board_key = aes256gcm.encrypt(board_key, key_encryption_key, iv)
 
 > Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
-5. IDs für die public keys erstellen
+5. IDs für die öffentlichen Schlüssel erstellen
 
 ```python
 id1 = sha256(kyber_public_key_user)
@@ -450,17 +450,17 @@ TODO: image
 
 8. Schritte 2-7 für alle Nutzer mit Zugriffsrechten wiederholen - exklusive aller Nutzer, deren Zugriffsrechte entzogen
    wurden.
-9. Server informieren, dass der Board key gewechselt wurde
+9. Server informieren, dass der Board Key gewechselt wurde
 
 ```
 TODO: image
 ```
 
-> Schritt 9 stellt sicher, dass der alte Board key nicht weiterhin benutzt wird. Anschließend verhindert der Server das
-> Hinzufügen von Änderungen, die unter einem anderen Board key verschlüsselt wurden.
+> Schritt 9 stellt sicher, dass der alte Board Key nicht weiterhin benutzt wird. Anschließend verhindert der Server das
+> Hinzufügen von Änderungen, die unter einem anderen Board Key verschlüsselt wurden.
 >
 > Es ist möglich, dass in der Übergangszeit, also in der Zeit zwischen Schritt 1 und Schritt 9, weitere Post-it-Inhalte
-> unter dem alten Board key verschlüsselt und gepostet werden. Die initiale Absicht, weitere Post-it-Inhalte
+> unter dem alten Board Key verschlüsselt und gepostet werden. Die initiale Absicht, weitere Post-it-Inhalte
 > unzugänglich zu machen, wird also erst mit etwas Verzögerung technisch durchgesetzt.
 >
-> Nach Schritt 9 müssen alle Clients den neuen Board key beim Server erfragen, siehe dazu den Workflow "Board öffnen".
+> Nach Schritt 9 müssen alle Clients den neuen Board Key beim Server erfragen, siehe dazu den Workflow [Board öffnen](#board-öffnen).
