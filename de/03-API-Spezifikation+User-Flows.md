@@ -40,29 +40,38 @@ Weise können technisch auch beide Schlüsselpaare gleichzeitig abgelöst werden
 1. Generiere Schlüsselpaare und encryption salts
 
 ```python
-# encryption salt
-encryption_salt = random_bytes(16) # e.g. jv/DRgVf5WW5d5BTCyozOQ==
-
 # Kyber
-kyber_keypair = Kyber.gen_keypair()
-kyber_public_key_base64 = kyber_keypair.public # e.g. MIIFQzCBlwYJKoZIhvcNAQMBMIGJ...
+kyber_keypair            = Kyber.gen_keypair()
+kyber_public_key_base64  = kyber_keypair.public # e.g. MIIFQzCBlwYJKoZIhvcNAQMBMIGJ...
 kyber_private_key_base64 = kyber_keypair.private # e.g. MIIKBQIBADCBlwYJKoZIhvcNAQM...
+kyber_encryption_salt    = random_bytes(16) # e.g. jv/DRgVf5WW5d5BTCyozOQ==
 
 # RSA
-rsa_keypair = RSA.gen_keypair()
-rsa_public_key_base64 = rsa_keypair.public # e.g. MIICIjANBgkqhkiG9w0BAQEFAAOC...
-rsa_private_key_base64 = rsa_keypair.private # e.g. MIIJRAIBADANBgkqhkiG9w0BAQE...
+rsa_keypair              = RSA.gen_keypair()
+rsa_public_key_base64    = rsa_keypair.public # e.g. MIICIjANBgkqhkiG9w0BAQEFAAOC...
+rsa_private_key_base64   = rsa_keypair.private # e.g. MIIJRAIBADANBgkqhkiG9w0BAQE...
+rsa_encryption_salt      = random_bytes(16) # e.g. asdDRgVf5orcs5BTCyodea==
 ```
 
-2. Encryption key für die geheimen Schlüssel ableiten aus dem Nutzerpasswort und encryption salts
+2. Symmetrische Schlüssel für die Verschlüsselung privater Schlüssel aus dem Nutzerpasswort und Salt ableiten
 
 ```python
 encryption_key        = pbkdf2(password, "encryptPrivateKeys" || encryption_salt)
-iv                    = sha256(public key)
+iv                    = sha256(public_key)
 encrypted_private_key = aes256gcm.encrypt(private_key, encryption_key, iv)
 ```
 
-> Der Wert `sha256(public_key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
+Bemerkungen:
+
+* Die Berechnung passiert jeweils für Kyber und RSA mit den spezifischen Schlüsseln und Salts.
+* Die zum Einsatz kommenden kryptografischen Funktionen sind PBKDF2, AES-256 im Galois-Counter-Modus (AES-GCM) und im
+  Counter-Modus (AES-CTR) sowie SHA-256.
+* Der Wert `salt` besteht aus 16 Bytes, die von einem geeigneten Zufallszahlengenerator erstellt wurden, und wird
+  gemeinsam mit `encrypted_private_key` beim Server gespeichert.
+* Der konstante String `encryptPrivateKeys` wird genutzt, um eine Domänenseparierung zugewährleisten, damit ein zum Beispiel
+  beim Auth-Server gespeicherter PBKDF2-Passworthash nicht dem symmetrischen `encryption_key` entspricht. Dazu wird der
+  String mit dem Salt konkateniert (`||`).
+* Der Wert `sha256(public_key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 3. Ergebnis als DTO encodieren (beispielhaft für Kyber)
 
@@ -84,18 +93,18 @@ encrypted_private_key = aes256gcm.encrypt(private_key, encryption_key, iv)
 
 ![Registrierung der Schlüsselpaare](../images/03-02-key-pair-registration.png)
 
-> Das encryption salt für die Verschlüsselung des private keys ist aus kryptografischer Sicht an dieser Stelle
+> Das `encryption_salt` für die Verschlüsselung des `private_key`s ist aus kryptografischer Sicht an dieser Stelle
 > redundant und unpräzise benannt:
 >
-> * Der resultierende encryption key wird nur je einmal pro KEM-Schlüsselpaar verwendet. Deshalb kann der IV hier ohne Sicherheitsbedenken
->   statisch je Schlüsselpaar sein und das salt für PBKDF2 aus dem public key abgeleitet werden (bspw.
->   sha256(public key)). Somit ist ein separates encryption salt nicht technisch erforderlich.
-> * Das salt wird für PBKDF2 verwendet, nicht für die Verschlüsselung. Das Verschlüsseln bedingt aber PBKDF2 und damit das
->   salt.
-> * Damit ein Passworthash mit PBKDF2, der in einem anderen Kontext genutzt wird, nicht zufällig dem encryption key entspricht,
->   wird der konstante String `encryptPrivateKeys` dem salt vorangestellt.
+> * Die resultierenden `encryption_key`s werden nur je einmal verwendet. Deshalb kann der IV hier ohne Sicherheitsbedenken
+>   statisch je Schlüsselpaar sein und das Salt für PBKDF2 aus dem `public_key` abgeleitet werden (bspw.
+>   `sha256(public_key)`). Somit ist ein separates `encryption_salt` technisch nicht erforderlich.
+> * Das Salt wird für PBKDF2 verwendet, nicht für die Verschlüsselung. Das Verschlüsseln bedingt aber PBKDF2 und damit das
+>   Salt.
+> * Damit ein Passworthash mit PBKDF2, der in einem anderen Kontext genutzt wird, nicht zufällig dem `encryption_key` entspricht,
+>   wird der konstante String `encryptPrivateKeys` dem Salt vorangestellt.
 >
-> Wir verwenden an dieser Stelle trotzdem ein separates salt, um einerseits versehentlichen Fehlern an anderer Stelle
+> Wir verwenden an dieser Stelle trotzdem ein separates Salt, um einerseits versehentlichen Fehlern an anderer Stelle
 > vorzubeugen und andererseits weitere Verschlüsselungsmodi ohne API-Anpassungen zu ermöglichen.
 
 ## Board erstellen

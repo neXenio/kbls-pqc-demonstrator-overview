@@ -94,36 +94,8 @@ Server gespeichert werden. Dadurch können zudem alle Nutzer Zugriff auf die pub
 Private keys müssen geschützt werden. Eine Option besteht darin, die private keys lokal bei den Nutzern zu speichern. Da
 jeder Nutzer das neXboard von verschiedenen Geräten aus erreichen will, ist diese Option nicht ohne weiteres umsetzbar. Für
 bessere Usability werden die private keys stattdessen verschlüsselt beim Server gespeichert. Der symmetrische Schlüssel
-für diese Verschlüsselung leitet sich aus dem Passwort des Nutzers sowie zusätzlicher Entropie ab. Konkret
-wird hierfür folgender Prozess durchgeführt:
-
-1. `encryption_key = pbkdf2(user_password, "encryptPrivateKeys" || salt)`
-2. `encrypted_pq_secret_key = aes256gcm.encrypt(pq_secret_key, encryption_key, sha256(pq_public_key))`
-3. `encrypted_classic_secret_key = aes256gcm.encrypt(classic_secret_key, encryption_key, sha256(classic_public_key))`
-<!--
-   TODO Frage:
-   In 03 ließt sich das aber nach unterschiedlichen Salts je Verfahren, was dann zu einer doppelten Berechnung
-   der bewusst teueren PBKDF2 führt.
-   Ich bin von gleiches Salt, anderer IV durch anderen PubKey ausgegangen, was performanter wäre (und bei wenigen,
-   user-gewählten Pubkeys effektiv kein Kollisionsrisiko hat)
-   Man könnte in geiler sowas machen wie
-      master_key = pbkdf2(user_password, "encryptPrivateKeys" || salt)
-      kyber_secret_key = hkdf(master_key, "KyberSecretKey")
-      rsa_secret_key = hkdf(master_key, "RsaSecretKey")
-   Dann muss man nur einmal die teuere KDF rechnen und hat darauf basierend schnelle KDF mit Domain-Separation nach Verfahren
-
-   TODO: je nach antwort, fix 02 und/oder 03
--->
-
-Bemerkungen:
-
-* Die zum Einsatz kommenden kryptografischen Funktionen sind PBKDF2, AES-256 im Galois-Counter-Modus (AES-GCM) und im
-  Counter-Modus (AES-CTR) sowie SHA-256
-* Der Wert `salt` besteht aus 16 Bytes, die von einem geeigneten Zufallszahlengenerator erstellt wurden, und wird
-  gemeinsam mit `encrypted_pq_secret_key` und `encrypted_classic_secret_key` beim Server gespeichert.
-* Der konstante String `encryptPrivateKeys` wird genutzt, um eine Domänenseparierung zugewährleisten, damit ein zum Beispiel
-beim Auth-Server gespeicherter PBKDF2-Passworthash nicht dem encryption key entspricht.
-* Der Wert `sha256(*_public_key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
+für diese Verschlüsselung leitet sich aus dem Passwort des Nutzers sowie zusätzlicher Entropie ab. Der konkrete Prozess
+wird in der [API Spezifikation](03-API-Spezifikation%2BUser-Flows.md#Schlüsselpaare-registrieren) beschrieben.
 
 ## Schutz der Post-it-Inhalte im neXboard
 
