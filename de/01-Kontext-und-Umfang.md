@@ -6,7 +6,7 @@ Das Projekt KBLS ist motiviert durch die Notwendigkeit, "neue Quantencomputer-re
 Verfügung zu stellen, die von möglichst vielen effizient genutzt werden können". Ziel des Projekts ist es, die
 Kryptobibliothek botan "um Quantencomputer-resistente Verfahren zu erweitern". Darauf aufbauend sollen Entwickler:innen
 "Lösungen umsetzen können, die Angriffen von Quantencomputern widerstehen und somit langfristige Sicherheit der
-verarbeiteten Daten garantieren können". Darüberhinaus "wird die Leistungsfähigkeit und Benutzbarkeit der Bibliothek
+verarbeiteten Daten garantieren können". Darüber hinaus "wird die Leistungsfähigkeit und Benutzbarkeit der Bibliothek
 evaluiert".
 
 Um diese Ziele zu erreichen, soll im Arbeitspaket 13 ein prototypischer Demonstrator entwickelt werden. Der Demonstrator
@@ -40,7 +40,7 @@ werden.
 ![neXboard-Applikation](../images/01-nexboard-screenshot.png)
 
 Registrierte Nutzer können Boards erstellen und mit anderen Nutzern teilen. Die Zugriffsrechte für ein Board sind
-konfigurierbar: eine Einladung kann Zugriffe zum Lesen erlauben oder zum Schreiben. Einzelne Boards können außerdem per
+konfigurierbar: Eine Einladung kann Zugriffe zum Lesen erlauben oder zum Schreiben. Einzelne Boards können außerdem per
 "public link" geteilt werden, welcher auch ohne neXboard-Registrierung zugänglich ist.
 
 ## Schutzziele
@@ -48,11 +48,11 @@ konfigurierbar: eine Einladung kann Zugriffe zum Lesen erlauben oder zum Schreib
 Der Demonstrator soll zeigen, dass die Ergebnisse aus vorangegangenen Arbeitspaketen dafür verwendet werden können, die
 Inhalte eines Boards vor Angriffen durch Quantencomputer zu schützen. Daraus leiten sich zwei konkrete Schutzziele ab:
 
-* Vertraulichkeit: der Inhalt aller Post-its auf einem Board darf nur für authorisierte Nutzer zugänglich sein
+* Vertraulichkeit: der Inhalt aller Post-its auf einem Board darf nur für autorisierte Nutzer zugänglich sein
   * Weiter sollen jegliche Inhalte für den Server nicht standardmäßig lesbar sein
-* Integrität: Veränderungen am Inhalt eines Post-its können nur durch authorisierte Nutzer durchgeführt werden
+* Integrität: Veränderungen am Inhalt eines Post-its können nur durch autorisierte Nutzer durchgeführt werden
 
-Authorisierte Nutzer erhalten Zugriff auf alle Inhalte seit Erstellung eines Boards (keine backward secrecy).
+Autorisierte Nutzer erhalten Zugriff auf alle Inhalte seit Erstellung eines Boards (keine backward secrecy).
 Zugriffsrechte sollen aber entzogen werden können, damit Inhalte ab diesem Zeitpunkt nicht weiter zugänglich sind
 (forward secrecy).
 

@@ -154,7 +154,7 @@ id2 = sha256(rsa_public_key_user)
 
 ## Board bearbeiten
 
-Sobald ein Board erstellt oder geöffnet ist, liegt die Board ID sowie der Board key vor. Der IV für die Verschlüsselung des
+Sobald ein Board erstellt oder geöffnet ist, liegt die Board-ID sowie der Board key vor. Der IV für die Verschlüsselung des
 jeweiligen Post-it-Inhalts wird zufällig vom Client bestimmt. Jedes erstellte Post-it erhält eine eindeutige ID. Jede Änderung
 an einem Post-it wird mit einem aktuellen Zeitstempel versehen.
 
