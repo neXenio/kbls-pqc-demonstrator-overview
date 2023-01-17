@@ -3,11 +3,11 @@
 ## Übersicht
 
 Im Projekt KBLS werden kryptografische Verfahren entwickelt, die robust gegen Angriffe von Quantencomputern sind. Als Anwendungsfall
-verwenden wir den Web-Client von neXboard. neXboard bietet eine Lösung für digitale Whiteboards, auf denen die Nutzer Post-Its
-erstellen und bearbeiten können - kollaborativ und in Echtzeit. Ziel ist, die Inhalte der Post-Its quantenresistent zu schützen,
+verwenden wir den Web-Client von neXboard. neXboard bietet eine Lösung für digitale Whiteboards, auf denen die Nutzer Post-its
+erstellen und bearbeiten können - kollaborativ und in Echtzeit. Ziel ist, die Inhalte der Post-its quantenresistent zu schützen,
 ohne die interaktiven Möglichkeiten des Boards einzuschränken.
 
-Zu diesem Zweck wird für jedes Board ein sogenannter Board Key erstellt, der die Post-Its symmetrisch verschlüsselt. Der
+Zu diesem Zweck wird für jedes Board ein sogenannter Board Key erstellt, der die Post-its symmetrisch verschlüsselt. Der
 Board Key selbst wird so verschlüsselt, dass er mit beliebig vielen Nutzern mit Zugriffsrechten geteilt werden kann und
 quantenresistent geschützt ist. Wenn einem Nutzer die Zugriffsrechte entzogen werden, ändert sich der Board Key, damit alle
 zukünftigen Inhalte geschützt sind.

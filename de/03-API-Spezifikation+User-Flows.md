@@ -155,15 +155,15 @@ id2 = sha256(rsa_public_key_user)
 ## Board bearbeiten
 
 Sobald ein Board erstellt oder geöffnet ist, liegt die Board ID sowie der Board key vor. Der IV für die Verschlüsselung des
-jeweiligen Post-It-Inhalts wird zufällig vom Client bestimmt. Jedes erstellte Post-It erhält eine eindeutige ID. Jede Änderung
-an einem Post-It wird mit einem aktuellen Zeitstempel versehen.
+jeweiligen Post-it-Inhalts wird zufällig vom Client bestimmt. Jedes erstellte Post-it erhält eine eindeutige ID. Jede Änderung
+an einem Post-it wird mit einem aktuellen Zeitstempel versehen.
 
-Weil sich der Board key im Laufe der Zeit ändern kann, wird zudem der Board key referenziert, mit dem der Post-It
+Weil sich der Board key im Laufe der Zeit ändern kann, wird zudem der Board key referenziert, mit dem der Post-it
 Inhalt verschlüsselt wurde.
 
 Änderungen können in Batches an den Server geschickt werden.
 
-1. Post-It-Inhalt
+1. Post-it-Inhalt
 
 ```
 # given: board_key, postit_id, postit_content
@@ -267,7 +267,7 @@ board_key     = aes256gcm.dec(enc_board_key, encryption_key, iv)
 board_key_id  = sha256(board_key)
 ```
 
-5. Abrufen aller Post-It Inhalte beim Server mit anschließender MAC-Validierung und Entschlüsselung.
+5. Abrufen aller Post-it Inhalte beim Server mit anschließender MAC-Validierung und Entschlüsselung.
 
 <!-- https://excalidraw.com/#json=VtA_sS3ON0MswyHYhO4gO,RE1zG5GBnTNcUvPZWTDgSw -->
 ![](../images/03-05-05-get-events.png)
@@ -351,7 +351,7 @@ id2_target = sha256(rsa_public_key_bob)
 
 ## Zugriffsrechte für ein Board entziehen
 
-Wenn Nutzern die Zugriffsrechte entzogen werden, müssen alle künftigen Post-It Inhalte auf eine andere Weise
+Wenn Nutzern die Zugriffsrechte entzogen werden, müssen alle künftigen Post-it Inhalte auf eine andere Weise
 verschlüsselt werden, um das Schutzziel weiterhin zu erfüllen. Dazu wird ein neuer Board key erstellt und verteilt.
 Dieser Prozess funktioniert weitestgehend wie die Prozesse für das Erstellen und Teilen des Boards.
 
@@ -423,8 +423,8 @@ TODO: image
 > Schritt 9 stellt sicher, dass der alte Board key nicht weiterhin benutzt wird. Anschließend verhindert der Server das
 > Hinzufügen von Änderungen, die unter einem anderen Board key verschlüsselt wurden.
 >
-> Es ist möglich, dass in der Übergangszeit, also in der Zeit zwischen Schritt 1 und Schritt 9, weitere Post-It Inhalte
-> unter dem alten Board key verschlüsselt und gepostet werden. Die initiale Absicht, weitere Post-It Inhalte
+> Es ist möglich, dass in der Übergangszeit, also in der Zeit zwischen Schritt 1 und Schritt 9, weitere Post-it Inhalte
+> unter dem alten Board key verschlüsselt und gepostet werden. Die initiale Absicht, weitere Post-it Inhalte
 > unzugänglich zu machen, wird also erst mit etwas Verzögerung technisch durchgesetzt.
 >
 > Nach Schritt 9 müssen alle Clients den neuen Board key beim Server erfragen, siehe dazu den Workflow "Board öffnen".

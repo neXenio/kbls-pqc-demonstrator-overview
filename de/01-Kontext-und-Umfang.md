@@ -29,11 +29,11 @@ Diesbezüglich sind die wichtigsten Ergebnisse aus den vorangegangenen Arbeitspa
 Das System neXboard bietet eine Web-basierte Lösung für digitale Whiteboards. Ein Board umfasst folgende
 Funktionalitäten:
 
-* Erstellung von Post-Its
+* Erstellung von Post-its
 * Upload von Bildern
-* Verknüpfung mehrerer Post-Its oder Bilder
+* Verknüpfung mehrerer Post-its oder Bilder
 
-Die Größe sowie Position von Post-Its und Bildern können verändert werden. Bei Post-Its können darüber hinaus die
+Die Größe sowie Position von Post-its und Bildern können verändert werden. Bei Post-its können darüber hinaus die
 Farbe und der Inhalt verändert werden. Die Inhalte eines Boards können von mehreren Nutzern gleichzeitig bearbeitet
 werden.
 
@@ -48,9 +48,9 @@ konfigurierbar: eine Einladung kann Zugriffe zum Lesen erlauben oder zum Schreib
 Der Demonstrator soll zeigen, dass die Ergebnisse aus vorangegangenen Arbeitspaketen dafür verwendet werden können, die
 Inhalte eines Boards vor Angriffen durch Quantencomputer zu schützen. Daraus leiten sich zwei konkrete Schutzziele ab:
 
-* Vertraulichkeit: der Inhalt aller Post-Its auf einem Board darf nur für authorisierte Nutzer zugänglich sein
+* Vertraulichkeit: der Inhalt aller Post-its auf einem Board darf nur für authorisierte Nutzer zugänglich sein
   * Weiter sollen jegliche Inhalte für den Server nicht standardmäßig lesbar sein
-* Integrität: Veränderungen am Inhalt eines Post-Its können nur durch authorisierte Nutzer durchgeführt werden
+* Integrität: Veränderungen am Inhalt eines Post-its können nur durch authorisierte Nutzer durchgeführt werden
 
 Authorisierte Nutzer erhalten Zugriff auf alle Inhalte seit Erstellung eines Boards (keine backward secrecy).
 Zugriffsrechte sollen aber entzogen werden können, damit Inhalte ab diesem Zeitpunkt nicht weiter zugänglich sind
@@ -64,13 +64,13 @@ dann ist das Schutzziel nicht erfüllt.
 
 Schützenswerte Information:
 
-* Position, Größe, Farbe und Verknüpfungen eines Post-Its sind nicht zwingend zu schützen
-* Authentizität: Die eindeutige Urheberschaft eines Post-Its muss nicht sichergestellt werden
+* Position, Größe, Farbe und Verknüpfungen eines Post-its sind nicht zwingend zu schützen
+* Authentizität: Die eindeutige Urheberschaft eines Post-its muss nicht sichergestellt werden
 * Server ist honest-but-curious[^1], das heißt er wird nicht aktiv versuchen die Kommunikation zu verändern, ihm wird aber
 nicht bezüglich der Vertraulichkeit vertraut. Insbesondere auch:
   * Integrität der Client-Applikation: Der Server liefert das Frontend unverändert aus und verändert nicht die für die Clients
   gespeicherten Daten
-  * Vollständigkeit: Dem Server wird vertraut, keine Post-Its zu unterschlagen
+  * Vollständigkeit: Dem Server wird vertraut, keine Post-its zu unterschlagen
 * Verfügbarkeit: der neXboard-Server ist hochverfügbar
 * Sicherheit kryptografischer Primitive: AES-256, SHA-256 und Kyber sind bis zu einem ausreichenden Sicherheitslevel quantenresistent
 
