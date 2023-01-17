@@ -165,12 +165,12 @@ Inhalt verschlüsselt wurde.
 
 1. Post-It-Inhalt
 
-<!-- TODO: Ver- und Entschlüsselung von Boardinhalten auf CTR+HMAC ändern -->
 ```
 # given: board_key, postit_id, postit_content
 timestamp                = System.now()
 iv                       = prng(12)
-encrypted_postit_content = aes256gcm.enc(postit_content, board_key, iv)
+encrypted_postit_content = aes256ctr.enc(postit_content, board_key, iv)
+encryption_mac           = hmac(encrypted_postit_content, board_key)
 board_key_id             = sha256(board_key)
 ```
 
@@ -180,15 +180,16 @@ board_key_id             = sha256(board_key)
 {
   "objectId": "05402bfa9ff8bb20df8f29776e32c80c51b8fda88e1216b09fa54b5c9c5b3fd7",
   "timestamp": 1669823977123521245,
-  "dataEncryptionMode": "AES_256_GCM",
+  "dataEncryptionMode": "AES_256_CTR_HMAC_SHA256",
   "iv": "GBkdJP3GdbjAsa49",
   "ciphertext": "6Qe3UMxK7RBvr4Md9kV2+2VW2I3tsoAIaSci8nrZ/bp8HfLL4VG2zQ==",
+  "mac": "22eb68c574d53a83c984c785a94680130b4f94bfd530167c993b3db83f8aa1b1",
   "boardKeyId": "cf5a8d5983625d5b3c662a843720aa387d41e8a9d8d4964d1e72a24021ce32f0"
 }
 ```
 
 3. Änderungen aggregieren und an den Server schicken
-<!-- https://excalidraw.com/#json=_3EmHzET-n8i9SZu4NkfL,STf7V0hUO6m9V5VXF3fhkA -->
+<!-- https://excalidraw.com/#json=x04kjo7fDurdefJud1BaL,ptFPOFhUBPh734af8HsoEA -->
 ![](../images/03-04-edit-board.png)
 
 ## Board öffnen
@@ -264,9 +265,9 @@ board_key     = aes256gcm.dec(enc_board_key, encryption_key, iv)
 board_key_id  = sha256(board_key)
 ```
 
-5. Abrufen aller Post-It Inhalte beim Server mit anschließender Entschlüsselung
+5. Abrufen aller Post-It Inhalte beim Server mit anschließender MAC-Validierung und Entschlüsselung.
 
-<!-- https://excalidraw.com/#json=gbYiMff7SZmoBRFmvhExn,cPO0OtK_NfG8xq3sEvQ4lQ -->
+<!-- https://excalidraw.com/#json=VtA_sS3ON0MswyHYhO4gO,RE1zG5GBnTNcUvPZWTDgSw -->
 ![](../images/03-05-05-get-events.png)
 
 ```
@@ -278,7 +279,10 @@ events_encrypted_for_board_key = filter(same_board_key_id, board_events)
 for board_event in events_encrypted_for_board_key:
   ciphertext       = board_event.ciphertext
   iv               = board_event.iv
-  board_event_data = aes256gcm.dec(ciphertext, board_key, iv)
+  mac              = board_event.mac
+  assert(mac == hmac(ciphertext, board_key))
+
+  board_event_data = aes256ctr.dec(ciphertext, board_key, iv)
 ```
 
 ## Board mit anderen Nutzern teilen
