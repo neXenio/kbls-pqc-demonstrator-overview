@@ -34,13 +34,13 @@ Funktionalitäten:
 * Verknüpfung mehrerer Post-its oder Bilder
 
 Die Größe sowie Position von Post-its und Bildern können verändert werden. Bei Post-its können darüber hinaus die
-Farbe und der Inhalt verändert werden. Die Inhalte eines Boards können von mehreren Nutzern gleichzeitig bearbeitet
+Farbe und der Inhalt verändert werden. Die Inhalte eines Boards können von mehreren Nutzer:innen gleichzeitig bearbeitet
 werden.
 
 ![neXboard-Applikation](../images/01-nexboard-screenshot.png)
 
-Registrierte Nutzer können Boards erstellen und mit anderen Nutzern teilen. Die Zugriffsrechte für ein Board sind
-konfigurierbar: Eine Einladung kann Zugriffe zum Lesen erlauben oder zum Schreiben. Einzelne Boards können außerdem per
+Registrierte Nutzer:innen können Boards erstellen und mit anderen Nutzer:innen teilen. Die Zugriffsrechte für ein Board sind
+konfigurierbar: Eine Einladung kann Zugriffe zum Lesen oder zum Schreiben erlauben. Einzelne Boards können außerdem per
 "public link" geteilt werden, welcher auch ohne neXboard-Registrierung zugänglich ist.
 
 ## Schutzziele
@@ -55,7 +55,7 @@ Inhalte eines Boards vor Angriffen durch Quantencomputer zu schützen. Daraus le
   * Veränderungen am Inhalt eines Post-its können nur durch autorisierte Nutzer:innen durchgeführt werden
   * Insbesondere wird nur die Integrität jedes einzelnen Post-its geschützt, nicht die des gesamten Boards
 
-Autorisierte Nutzer erhalten Zugriff auf alle Inhalte seit Erstellung eines Boards (keine backward secrecy).
+Autorisierte Nutzer:innen erhalten Zugriff auf alle Inhalte seit Erstellung eines Boards (keine backward secrecy).
 Zugriffsrechte sollen aber entzogen werden können, damit Inhalte ab diesem Zeitpunkt nicht weiter zugänglich sind
 (forward secrecy).
 
@@ -85,10 +85,11 @@ geändert werden, dies hat allerdings weitreichende Folgen und erfordert teils s
   Post-its (Position, Größe, Farbe, Verknüpfungen, Version)
   * Der Server kann also bspw. Post-its verschieben oder alte Post-its anzeigen
 * Keine Authentizität oder Deniability: Die eindeutige Urheberschaft eines Post-its muss nicht sichergestellt werden
-  * Nutzer haben also keine Möglichkeit zu bestimmen oder abzustreiten, wer ein bestimmtes Post-it verfasst hat
-  * Nutzer haben außerdem keine Möglichkeit zu bestimmen oder abzustreiten, wer einen bestimmten Board Key ausgestellt hat 
-* Keine Backward Secrecy: eingeladene Nutzer erhalten Einsicht auf alle bisher geteilten Daten
-* Keine Forward Secrecy: wenn ein Angreifer Zugriff auf einen Board Key erhält, erhält er damit Zugriff auf alle 
+  * Nutzer:innen haben also keine Möglichkeit zu bestimmen oder abzustreiten, wer ein bestimmtes Post-it verfasst hat
+  * Nutzer:innen haben außerdem keine Möglichkeit zu bestimmen oder abzustreiten, wer einen bestimmten Board Key ausgestellt
+    hat
+* Keine Backward Secrecy: eingeladene Nutzer:innen erhalten Einsicht auf alle bisher geteilten Daten
+* Keine Forward Secrecy: wenn ein Angreifer Zugriff auf einen Board Key erhält, erhält er damit Zugriff auf alle
   Post-it-Inhalte, die unter diesem Board Key verschlüsselt werden.
 
 [^1]: Bezüglich allen Daten außer dem Passwort. Aufgrund des bisherigen Aufbaus von neXboard müssen sich Nutzer
