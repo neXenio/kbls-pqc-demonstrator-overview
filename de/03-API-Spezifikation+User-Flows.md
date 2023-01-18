@@ -214,9 +214,25 @@ board_key_id             = sha256(board_key)
 }
 ```
 
+> Die `objectId` ist die ID des Post-its und wird vom Client bestimmt. Diese kann entweder eine UUID sein oder ein 
+> geeigneter Hash-Wert, bspw. aus der Konkatenation von `iv` und `mac` bei der ersten Erstellung des Post-its. Der Vorteil 
+> des Hash-Werts ist, dass dieser einen [natürlicher Schlüssel](https://en.wikipedia.org/wiki/Natural_key) darstellt. 
+> Im Gegensatz dazu stellt die UUID einen [künstlichen Schlüssel](https://en.wikipedia.org/wiki/Surrogate_key) dar.
+
 3. Änderungen aggregieren und an den Server schicken
 <!-- https://excalidraw.com/#json=x04kjo7fDurdefJud1BaL,ptFPOFhUBPh734af8HsoEA -->
 ![Bearbeitung eines Boards](../images/03-04-edit-board.png)
+
+> Der Endpunkt `/events/{boardId}` wird verwendet, um Post-it-Inhalte an den Server zu schicken. Jede Erstellung oder
+> Änderung eines Post-its wird als Event modelliert. Es können mehrere Events gleichzeitig an den Server geschickt werden,
+> um die Netzwerkverbindung effizienter zu benutzen ("batching"). 
+> 
+> Wichtig ist hier, dass der Zeitstempel möglichst präzise oder zumindest ehrlich gegenüber den anderen Board-Teilnehmer:innen 
+> bestimmt wird, da über den Zeitstempel die Reihenfolge der Events bestimmt werden kann. Letztlich ist es allerdings
+> die Entscheidung des Servers, ob etwa
+> * alle Events gespeichert und anhand ihres Zeitstempels sortiert werden oder
+> * nur das Event gespeichert wird, welches der Server zuletzt erhalten hat ("last write wins") oder
+> * die `objectId` quasi als Parent-ID verwendet wird, sodass Ketten (bzw. Bäume) von Events modelliert werden.
 
 ## Board öffnen
 
