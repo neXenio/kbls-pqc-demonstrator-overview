@@ -65,7 +65,6 @@ dann ist das Schutzziel nicht erfüllt.
 
 ## Vereinfachende Annahmen
 
-* Position, Größe, Farbe und Verknüpfungen eines Post-its sind nicht zwingend zu schützen
 * Server ist honest-but-curious[^1], das heißt er wird nicht aktiv versuchen die Kommunikation zu verändern, ihm wird aber
 nicht bezüglich der Vertraulichkeit vertraut. Insbesondere auch:
   * Integrität der Client-Applikation: Der Server liefert das Frontend unverändert aus und verändert nicht die für die Clients
@@ -81,15 +80,16 @@ bleiben. Die Alternative, diese Einschränkungen auszuschließen, ist nur mit an
 etwa die Wartbarkeit, Bedienbarkeit oder Performanz des Systems betreffen. Einzelne Nicht-Ziele können später in Ziele
 geändert werden, dies hat allerdings weitreichende Folgen und erfordert teils signifikante Anpassungen am Konzept.
 
+* Es werden keine besonderen Maßnahmen getroffen, um gegen einen aktiv angreifenden Applikationsserver zu verteidigen
 * Die Vertraulichkeit und Integrität des gesamten Boards wird nicht sichergestellt, insb. betrifft dies die Metadaten von 
   Post-its (Position, Größe, Farbe, Verknüpfungen, Version)
   * Der Server kann also bspw. Post-its verschieben oder alte Post-its anzeigen
-* Authentizität und Deniability: Die eindeutige Urheberschaft eines Post-its muss nicht sichergestellt werden
+* Keine Authentizität oder Deniability: Die eindeutige Urheberschaft eines Post-its muss nicht sichergestellt werden
   * Nutzer haben also keine Möglichkeit zu bestimmen oder abzustreiten, wer ein bestimmtes Post-it verfasst hat
   * Nutzer haben außerdem keine Möglichkeit zu bestimmen oder abzustreiten, wer einen bestimmten Board Key ausgestellt hat 
-* Backward Secrecy: eingeladene Nutzer erhalten Einsicht auf alle bisher geteilten Daten
-* Forward Secrecy: wenn ein Angreifer Zugriff auf einen Board Key erhält, erhält er damit Zugriff auf alle Post-it-Inhalte,
-  die unter diesem Board Key verschlüsselt wurden.
+* Keine Backward Secrecy: eingeladene Nutzer erhalten Einsicht auf alle bisher geteilten Daten
+* Keine Forward Secrecy: wenn ein Angreifer Zugriff auf einen Board Key erhält, erhält er damit Zugriff auf alle 
+  Post-it-Inhalte, die unter diesem Board Key verschlüsselt werden.
 
 [^1]: Bezüglich allen Daten außer dem Passwort. Aufgrund des bisherigen Aufbaus von neXboard müssen sich Nutzer
 mit Nutzername und Passwort am Server anmelden. Im beschriebenen System nimmt das Passwort aber auch eine sicherheitskritische
