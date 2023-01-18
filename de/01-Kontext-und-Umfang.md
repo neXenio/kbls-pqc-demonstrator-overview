@@ -81,7 +81,7 @@ etwa die Wartbarkeit, Bedienbarkeit oder Performanz des Systems betreffen. Einze
 geändert werden, dies hat allerdings weitreichende Folgen und erfordert teils signifikante Anpassungen am Konzept.
 
 * Es werden keine besonderen Maßnahmen getroffen, um gegen einen aktiv angreifenden Applikationsserver zu verteidigen
-* Die Vertraulichkeit und Integrität des gesamten Boards wird nicht sichergestellt, insb. betrifft dies die Metadaten von 
+* Die Vertraulichkeit und Integrität des gesamten Boards wird nicht sichergestellt, insb. betrifft dies die Metadaten von
   Post-its (Position, Größe, Farbe, Verknüpfungen, Version)
   * Der Server kann also bspw. Post-its verschieben oder alte Post-its anzeigen
 * Keine Authentizität oder Deniability: Die eindeutige Urheberschaft eines Post-its muss nicht sichergestellt werden
