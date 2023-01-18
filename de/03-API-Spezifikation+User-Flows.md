@@ -12,26 +12,26 @@ Die folgenden User Flows beschreiben, wie die API verwendet wird.
 > Elliptic-Curve-Variante). Technisch lässt sich auch RSA mit EC kombinieren, aber dies hat keinen praktischen Nutzen in
 > Bezug auf die Quantencomputerresistenz.
 
-## Nutzer registrieren
+## Registrierung
 
 Am bestehenden Prozess der Nutzerregistrierung ändert sich nichts. Für die beschriebenen Funktionalitäten müssen aber
-für jeden Nutzer zwei Schlüsselpaare registriert werden. Die Verknüpfung erfolgt über die User ID, die bei der
-Registrierung des Nutzers festgelegt wird (bspw. die E-Mail-Adresse).
+für alle Nutzer:innen je zwei Schlüsselpaare registriert werden. Die Verknüpfung erfolgt über die User ID, die bei der
+Registrierung festgelegt wird (bspw. die E-Mail-Adresse).
 
-![Registrierung eines Nutzers](../images/03-01-user-registration.png)
+![Registrierung](../images/03-01-user-registration.png)
 
 ## Schlüsselpaare registrieren
 
-Jeder Nutzer benötigt für die beschriebenen Funktionalitäten zwei Schlüsselpaare, die clientseitig generiert und
+Alle Nutzer:innen benötigen für die beschriebenen Funktionalitäten zwei Schlüsselpaare, die clientseitig generiert und
 serverseitig persistiert werden. Jedes Schlüsselpaar enthält einen privaten Schlüssel, der clientseitig verschlüsselt
 wird, damit er serverseitig nicht ausgelesen werden kann.
 
-Dieser Prozess wird auch verwendet, um alte Schlüsselpaare durch neue abzulösen. Will ein Nutzer beispielsweise ein RSA-Schlüsselpaar
-durch ein EC-Schlüsselpaar ablösen, wird das aktuelle Kyber-Schlüsselpaar zusammen mit dem neuen EC-Schlüsselpaar registriert.
-Zu beachten ist hierbei jedoch, dass aufgrund ihrer Natur die Schlüsselpaare jeweils nur mit der exakt gleichen Kombination
-auf der Empfängerseite kommunizieren können. Ein vollständiger Wechsel benötigt daher eine Generierung neuer Schlüssel
-aufseiten aller Kommunikationspartner. Eine einseitige Willenserklärung einen neuen Schlüssel zu verwenden kann dadurch
-jedoch abgegeben und von einzelnen, kryptografisch kompatiblen Kommunikationspartnern honoriert werden.
+Dieser Prozess wird auch verwendet, um alte Schlüsselpaare durch neue abzulösen. Soll beispielsweise ein RSA-Schlüsselpaar
+durch ein EC-Schlüsselpaar abgelöst werden, wird das aktuelle Kyber-Schlüsselpaar zusammen mit dem neuen EC-Schlüsselpaar
+registriert. Zu beachten ist hierbei jedoch, dass aufgrund ihrer Natur die Schlüsselpaare jeweils nur mit der exakt gleichen
+Kombination auf der Empfängerseite kommunizieren können. Ein vollständiger Wechsel benötigt daher eine Generierung neuer
+Schlüssel aufseiten aller Kommunikationspartner:innen. Eine einseitige Willenserklärung einen neuen Schlüssel zu verwenden
+kann dadurch jedoch abgegeben und von einzelnen, kryptografisch kompatiblen Kommunikationspartner:innen honoriert werden.
 
 Der genaue Prozess, wie diese Rotation im Falle einer signifikanten Verschlechterung des Schutzniveaus (etwa im Fall eines
 neuen mathematischen Durchbruchs) schnell praktisch umgesetzt werden kann, ist nicht Teil dieses Konzepts. Auf die selbe
@@ -109,9 +109,9 @@ Bemerkungen:
 
 ## Board erstellen
 
-Die Erstellung eines Boards erfordert die Erstellung eines Board Keys und dessen Verschlüsselung. Der Nutzer, der
+Die Erstellung eines Boards erfordert die Erstellung eines Board Keys und dessen Verschlüsselung. Die Person, die
 dieses Board erstellt, teilt das Board gewissermaßen mit sich selbst. Im oben beschriebenen hybriden
-Schlüsseleinigungsverfahren nimmt der Nutzer die Rolle von Alice und Bob ein.
+Schlüsseleinigungsverfahren nimmt diese Person die Rollen von Alice und Bob ein.
 
 1. Board ID (UUID Version 4) und Board Key generieren (32 zufällige Bytes)
 
@@ -221,8 +221,8 @@ Wir nehmen der Einfachheit halber an, Alice hat das Board selber erstellt und da
 Zur besseren Veranschaulichung dieses Prozesses nehmen wir zudem an, dass Alice den Client seitdem neu gestartet hat
 und lediglich ihre Zugangsdaten kennt.
 
-Um das Board zu öffnen, muss zuerst der Board Key entschlüsselt werden. Dazu sind einerseits die privaten Schlüssel des
-Nutzers erforderlich und andererseits der verschlüsselte Board Key. Alice holt sich beides vom Server:
+Um das Board zu öffnen, muss zuerst der Board Key entschlüsselt werden. Dazu sind einerseits die privaten Nutzerschlüssel
+erforderlich und andererseits der verschlüsselte Board Key. Alice holt sich beides vom Server:
 
 1. Abrufen der hybriden Schlüsselpaare beim Server
 
@@ -317,9 +317,9 @@ for board_event in events_encrypted_for_board_key:
 
 > Dieser Schritt wird für alle Board Keys analog durchgeführt.
 
-## Board mit anderen Nutzern teilen
+## Board mit anderen Nutzer:innen teilen
 
-Der Prozess, ein Board mit einem anderen Nutzer zu teilen, ist im Wesentlichen der gleiche wie der Prozess, ein Board
+Der Prozess, ein Board mit anderen Nutzer:innen zu teilen, ist im Wesentlichen der gleiche wie der Prozess, ein Board
 zu erstellen. Die einladende Nutzerin heißt im folgenden Alice, der eingeladene Nutzer heißt Bob.
 
 Der Prozess für Bob, das Board anschließend zu öffnen, ist der gleiche wie für Alice bereits oben beschrieben ist.
@@ -377,7 +377,7 @@ id2_target = sha256(rsa_public_key_bob)
 7. Board Encryption Data DTO an den Server schicken
 
 <!-- https://excalidraw.com/#json=WzorYgkbf6BKiXkjitVzJ,Gi-jFrDww1BXTYq_ddmtgg -->
-![Board mit anderen Nutzern teilen](../images/03-06-share-board.png)
+![Board mit anderen Nutzer:innen teilen](../images/03-06-share-board.png)
 
 > Dieser Prozess wird für alle im Board genutzten Board Keys durchgeführt. Dabei werden die Verschlüsselungen analog, aber
 > unabhängig voneinander durchgeführt. Insbesondere wird für jeden Board Key ein neuer Durchlauf des KEM-Verfahrens durchgeführt.
@@ -385,7 +385,7 @@ id2_target = sha256(rsa_public_key_bob)
 
 ## Zugriffsrechte für ein Board entziehen
 
-Wenn Nutzern die Zugriffsrechte entzogen werden, müssen alle künftigen Post-it-Inhalte auf eine andere Weise
+Wenn Nutzer:innen die Zugriffsrechte entzogen werden, müssen alle künftigen Post-it-Inhalte auf eine andere Weise
 verschlüsselt werden, um das Schutzziel weiterhin zu erfüllen. Dazu wird ein neuer Board Key erstellt und verteilt.
 Dieser Prozess funktioniert weitestgehend wie die Prozesse für das Erstellen und Teilen des Boards.
 
@@ -448,8 +448,8 @@ id2 = sha256(rsa_public_key_user)
 TODO: image
 ```
 
-8. Schritte 2-7 für alle Nutzer mit Zugriffsrechten wiederholen - exklusive aller Nutzer, deren Zugriffsrechte entzogen
-   wurden.
+8. Schritte 2-7 für alle Nutzer:innen mit Zugriffsrechten wiederholen - exklusive aller Nutzer:innen, deren Zugriffsrechte
+   entzogen wurden.
 9. Server informieren, dass der Board Key gewechselt wurde
 
 ```

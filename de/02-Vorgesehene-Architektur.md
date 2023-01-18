@@ -14,7 +14,7 @@ werden, um Zugriffsrechte feingranular zu definieren und die Performanz zu verbe
 Für den Demonstrator wird ein hybrides Schlüsseleinigungsverfahren umgesetzt basierend auf der Kyber-Implementierung für
 botan. Darüber hinaus muss das Schlüsselmaterial, das hierfür zum Einsatz kommt, auf geeignete Weise geschützt werden.
 
-Ergebnis des hybriden Schlüsseleinigungsverfahrens ist, dass zwei Kommunikationspartner Alice und Bob Schlüsselmaterial
+Ergebnis des hybriden Schlüsseleinigungsverfahrens ist, dass zwei Kommunikationspartner:innen Alice und Bob Schlüsselmaterial
 ausgetauscht haben. Dieses Verfahren ist generisch konzipiert, d.h. es kann für verschiedene Use Cases verwendet werden.
 
 Im Kontext von neXboard wird dieses Schlüsselmaterial dafür verwendet, einen sogenannten Board Key zu verschlüsseln. Der
@@ -53,7 +53,7 @@ ohne Einbußen bei der (aktuellen) Sicherheit oder technischen Machbarkeit hinne
 
 Der Ablauf für das vorgesehene hybride Schlüsseleinigungsverfahren ist wie folgt:
 
-1. Zwei Kommunikationspartner Alice und Bob haben zwei Schlüsselpaare, bestehend aus einem öffentlichen Schlüssel
+1. Zwei Kommunikationspartner:innen Alice und Bob haben zwei Schlüsselpaare, bestehend aus einem öffentlichen Schlüssel
    (public key) zugänglich für beide und einem privaten Schlüssel (private key), der nur ihnen bekannt ist:
    * ein Schlüsselpaar für ein klassisches Verfahren, bspw. RSA
    * ein Schlüsselpaar für ein quantenresistentes Verfahren, bspw. Kyber
@@ -81,22 +81,24 @@ Quellen
 
 ### Benötigtes Schlüsselmaterial
 
-Für das hybride Schlüsseleinigungsverfahren werden für jeden Nutzer wie oben beschrieben zwei Schlüsselpaare benötigt.
-Das Ergebnis dieses Verfahrens ist ein KEK, der im Kontext von neXboard spezifisch für den Empfänger ist und mit jedem Aufruf
-variiert. Der KEK ist bereits ausreichend geschützt, weil dieser nur durch das Wissen der privaten Schlüssel ermittelt werden
-kann.
+Für das hybride Schlüsseleinigungsverfahren werden für alle Nutzer:innen wie oben beschrieben zwei Schlüsselpaare benötigt.
+Das Ergebnis dieses Verfahrens ist ein KEK, der im Kontext von neXboard spezifisch für die Empfängerseite ist und mit jedem
+Aufruf variiert. Der KEK ist bereits ausreichend geschützt, weil dieser nur durch das Wissen der privaten Schlüssel ermittelt
+werden kann.
 
 ### Schutzkonzept
 
 Öffentliche Schlüssel müssen nicht bezüglich ihrer Vertraulichkeit geschützt werden. Ihre Integrität ist allerdings wichtig,
 da sie der zentrale Anker der Nutzeridentität sind. Da wir korrektes Verhalten des Servers voraussetzen, können diese zentral
-beim Server gespeichert werden. Dadurch können zudem alle Nutzer Zugriff auf die öffentlichen Schlüssel anderer Nutzer erhalten.
+beim Server gespeichert werden. Dadurch können zudem alle Nutzer:innen Zugriff auf die öffentlichen Schlüssel anderer Nutzer:innen
+erhalten.
 
-Private Schlüssel müssen geschützt werden. Eine Option besteht darin, die privaten Schlüssel lokal bei den Nutzern zu speichern.
-Da jeder Nutzer das neXboard von verschiedenen Geräten aus erreichen will, ist diese Option nicht ohne weiteres umsetzbar.
-Für bessere Usability werden die privaten Schlüssel stattdessen verschlüsselt beim Server gespeichert. Der symmetrische Schlüssel
-für diese Verschlüsselung leitet sich aus dem Passwort des Nutzers sowie zusätzlicher Entropie ab. Der konkrete Prozess
-wird in der [API Spezifikation](03-API-Spezifikation%2BUser-Flows.md#Schlüsselpaare-registrieren) beschrieben.
+Private Schlüssel müssen geschützt werden. Eine Option besteht darin, die privaten Schlüssel lokal bei den Nutzer:innen
+zu speichern. Da viele Nutzer:innen das neXboard von verschiedenen Geräten aus erreichen wollen, ist diese Option nicht
+ohne weiteres umsetzbar. Für bessere Usability werden die privaten Schlüssel stattdessen verschlüsselt beim Server gespeichert.
+Der symmetrische Schlüssel für diese Verschlüsselung leitet sich aus dem individuellen Passwort sowie zusätzlicher Entropie
+ab. Der konkrete Prozess wird in der [API Spezifikation](03-API-Spezifikation%2BUser-Flows.md#Schlüsselpaare-registrieren)
+beschrieben.
 
 ## Schutz der Post-it-Inhalte im neXboard
 
@@ -121,13 +123,13 @@ sogenannte AEADs genutzt.
 Für den Anwendungsfall des neXboards sind die herkömmlichen AEADs leider nicht ohne Abstriche nutzbar. Insbesondere hat GCM
 nicht die Eigenschaft, dass ein Ciphertext ausschließlich unter einem Schlüssel erfolgreich entschlüsselbar ist. Im Speziellen
 ist es für einen Angreifer sogar leicht, zwei Schlüssel zu kreieren, die einen gemeinsamen Ciphertext jeweils zu einem potenziell
-sinnhaften Klartext entschlüsseln. Bei einem kollaborativen Board, in welches Nutzer eigens verschlüsselte Nachrichten hochladen
-und den symmetrischen Schlüssel jeweils an die Empfänger asymmetrisch verschlüsseln, kann diese Eigenschaft offensichtlich
-schadhaft genutzt werden. Dies gilt auch trotz der nicht gänzlichen freien Wahl der symmetrischen Schlüssel durch den Einsatz
-der KEMs. Wie im [originalen Paper zu Message Franking](https://eprint.iacr.org/2017/664.pdf) beschrieben, kann eine simple
-Encrypt-Then-HMAC-Konstruktion genutzt werden, um dieses Problem zu umgehen. Eine entsprechende Konstruktion bedingt jedoch
-einen Master-Schlüssel, der zur kollisions-resistenten Ableitung zweier Unter-Schlüssel genutzt wird. Da kein "Opening"
-vonnöten ist, ist die im Paper dargelegte "multiple-opening security" nicht notwendig.
+sinnhaften Klartext entschlüsseln. Bei einem kollaborativen Board, in welches Nutzer:innen eigens verschlüsselte Nachrichten
+hochladen und den symmetrischen Schlüssel jeweils an die Empfänger:innen asymmetrisch verschlüsseln, kann diese Eigenschaft
+offensichtlich schadhaft genutzt werden. Dies gilt auch trotz der nicht gänzlichen freien Wahl der symmetrischen Schlüssel
+durch den Einsatz der KEMs. Wie im [originalen Paper zu Message Franking](https://eprint.iacr.org/2017/664.pdf) beschrieben,
+kann eine simple Encrypt-Then-HMAC-Konstruktion genutzt werden, um dieses Problem zu umgehen. Eine entsprechende Konstruktion
+bedingt jedoch einen Master-Schlüssel, der zur kollisions-resistenten Ableitung zweier Unter-Schlüssel genutzt wird. Da
+kein "Opening" vonnöten ist, ist die im Paper dargelegte "multiple-opening security" nicht notwendig.
 
 Betrachten wir den Fall mit GCM erneut: Soll das Post-It unter beiden Schlüssel sinnhaft sein, muss es (da es nur einen Ciphertext
 gibt) ein sinnhaftes Klartextpaar geben, dessen bitweise Differenz exakt der bitweisen Differenz der Keystreams (GCM basiert
@@ -135,8 +137,8 @@ auf dem CTR-Modus) entspricht. Entsprechend ist der Angriff für lange Klartexte
 des Lösens des GHASH-Polynoms jeweils ein Ciphertextblock gezielt gewählt werden muss, um den gemeinsamen Tag korrekt zu
 erhalten, skaliert der Angriff weiterhin umso schlechter auf mehrere Post-Its und könnte bei entsprechendem Textvolumen nicht
 praktikabel sein. Dagegen könnten durch Implementierungsentscheidungen eines Clients Post-Its mit nicht druckbaren Zeichen
-nicht angezeigt und somit der Angriff praktisch doch ermöglicht werden. Darüber hinaus kann ein bösartiger Nutzer direkt vor
-und nach seinem Angriff auf ein einzelnes Post-It eine Key-Rotation bewirken, wodurch in jedem Fall ein gezielter Angriff
+nicht angezeigt und somit der Angriff praktisch doch ermöglicht werden. Darüber hinaus können bösartige Nutzer:innen direkt
+vor und nach einem Angriff auf ein einzelnes Post-It eine Key-Rotation bewirken, wodurch in jedem Fall ein gezielter Angriff
 möglich ist.
 
 Entsprechend entscheiden wir uns im neXboard bei der Verschlüsselung von Post-It-Inhalten dazu, nicht den AEAD GCM zu nutzen,
