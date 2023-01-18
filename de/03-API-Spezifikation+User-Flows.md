@@ -169,8 +169,10 @@ Inhalt verschlüsselt wurde.
 # given: board_key, postit_id, postit_content
 timestamp                = System.now()
 iv                       = prng(12)
-encrypted_postit_content = aes256ctr.enc(postit_content, board_key, iv)
-encryption_mac           = hmac(encrypted_postit_content, board_key)
+encryption_key           = hkdf(board_key, "ENC")
+authentication_key       = hkdf(board_key, "AUTH")
+encrypted_postit_content = aes256ctr.enc(postit_content, encryption_key, iv)
+encryption_mac           = hmac(encrypted_postit_content, authentication_key)
 board_key_id             = sha256(board_key)
 ```
 
@@ -277,12 +279,15 @@ same_board_key_id = lambda board_event: board_event.boardKeyId == board_key_id
 events_encrypted_for_board_key = filter(same_board_key_id, board_events)
 
 for board_event in events_encrypted_for_board_key:
-  ciphertext       = board_event.ciphertext
-  iv               = board_event.iv
-  mac              = board_event.mac
-  assert(mac == hmac(ciphertext, board_key))
+  ciphertext         = board_event.ciphertext
+  iv                 = board_event.iv
+  mac                = board_event.mac
+  encryption_key     = hkdf(board_key, "ENC")
+  authentication_key = hkdf(board_key, "AUTH")
+  hmac_validation    = constant_time_equals(mac, hmac(ciphertext, authentication_key)) 
+  assert(hmac_validation)
 
-  board_event_data = aes256ctr.dec(ciphertext, board_key, iv)
+  board_event_data   = aes256ctr.dec(ciphertext, encryption_key, iv)
 ```
 
 ## Board mit anderen Nutzern teilen
