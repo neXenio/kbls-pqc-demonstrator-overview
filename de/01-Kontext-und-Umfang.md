@@ -6,7 +6,7 @@ Das Projekt KBLS ist motiviert durch die Notwendigkeit, "neue Quantencomputer-re
 Verfügung zu stellen, die von möglichst vielen effizient genutzt werden können". Ziel des Projekts ist es, die
 Kryptobibliothek botan "um Quantencomputer-resistente Verfahren zu erweitern". Darauf aufbauend sollen Entwickler:innen
 "Lösungen umsetzen können, die Angriffen von Quantencomputern widerstehen und somit langfristige Sicherheit der
-verarbeiteten Daten garantieren können". Darüberhinaus "wird die Leistungsfähigkeit und Benutzbarkeit der Bibliothek
+verarbeiteten Daten garantieren können". Darüber hinaus "wird die Leistungsfähigkeit und Benutzbarkeit der Bibliothek
 evaluiert".
 
 Um diese Ziele zu erreichen, soll im Arbeitspaket 13 ein prototypischer Demonstrator entwickelt werden. Der Demonstrator
@@ -29,18 +29,18 @@ Diesbezüglich sind die wichtigsten Ergebnisse aus den vorangegangenen Arbeitspa
 Das System neXboard bietet eine Web-basierte Lösung für digitale Whiteboards. Ein Board umfasst folgende
 Funktionalitäten:
 
-* Erstellung von Post-Its
+* Erstellung von Post-its
 * Upload von Bildern
-* Verknüpfung mehrerer Post-Its oder Bilder
+* Verknüpfung mehrerer Post-its oder Bilder
 
-Die Größe sowie Position von Post-Its und Bildern können verändert werden. Bei Post-Its können darüber hinaus die
+Die Größe sowie Position von Post-its und Bildern können verändert werden. Bei Post-its können darüber hinaus die
 Farbe und der Inhalt verändert werden. Die Inhalte eines Boards können von mehreren Nutzern gleichzeitig bearbeitet
 werden.
 
 ![neXboard-Applikation](../images/01-nexboard-screenshot.png)
 
 Registrierte Nutzer können Boards erstellen und mit anderen Nutzern teilen. Die Zugriffsrechte für ein Board sind
-konfigurierbar: eine Einladung kann Zugriffe zum Lesen erlauben oder zum Schreiben. Einzelne Boards können außerdem per
+konfigurierbar: Eine Einladung kann Zugriffe zum Lesen erlauben oder zum Schreiben. Einzelne Boards können außerdem per
 "public link" geteilt werden, welcher auch ohne neXboard-Registrierung zugänglich ist.
 
 ## Schutzziele
@@ -48,11 +48,14 @@ konfigurierbar: eine Einladung kann Zugriffe zum Lesen erlauben oder zum Schreib
 Der Demonstrator soll zeigen, dass die Ergebnisse aus vorangegangenen Arbeitspaketen dafür verwendet werden können, die
 Inhalte eines Boards vor Angriffen durch Quantencomputer zu schützen. Daraus leiten sich zwei konkrete Schutzziele ab:
 
-* Vertraulichkeit: der Inhalt aller Post-Its auf einem Board darf nur für authorisierte Nutzer zugänglich sein
+* Vertraulichkeit: 
+  * Der Inhalt aller Post-its auf einem Board darf nur für autorisierte Nutzer zugänglich sein
   * Weiter sollen jegliche Inhalte für den Server nicht standardmäßig lesbar sein
-* Integrität: Veränderungen am Inhalt eines Post-Its können nur durch authorisierte Nutzer durchgeführt werden
+* Integrität: 
+  * Veränderungen am Inhalt eines Post-its können nur durch autorisierte Nutzer durchgeführt werden
+  * Insbesondere wird nur die Integrität jedes einzelnen Post-its geschützt, nicht die des gesamten Boards
 
-Authorisierte Nutzer erhalten Zugriff auf alle Inhalte seit Erstellung eines Boards (keine backward secrecy).
+Autorisierte Nutzer erhalten Zugriff auf alle Inhalte seit Erstellung eines Boards (keine backward secrecy).
 Zugriffsrechte sollen aber entzogen werden können, damit Inhalte ab diesem Zeitpunkt nicht weiter zugänglich sind
 (forward secrecy).
 
@@ -62,17 +65,31 @@ dann ist das Schutzziel nicht erfüllt.
 
 ## Vereinfachende Annahmen
 
-Schützenswerte Information:
-
-* Position, Größe, Farbe und Verknüpfungen eines Post-Its sind nicht zwingend zu schützen
-* Authentizität: Die eindeutige Urheberschaft eines Post-Its muss nicht sichergestellt werden
 * Server ist honest-but-curious[^1], das heißt er wird nicht aktiv versuchen die Kommunikation zu verändern, ihm wird aber
 nicht bezüglich der Vertraulichkeit vertraut. Insbesondere auch:
   * Integrität der Client-Applikation: Der Server liefert das Frontend unverändert aus und verändert nicht die für die Clients
   gespeicherten Daten
-  * Vollständigkeit: Dem Server wird vertraut, keine Post-Its zu unterschlagen
+  * Vollständigkeit: Dem Server wird vertraut, keine Post-its zu unterschlagen
 * Verfügbarkeit: der neXboard-Server ist hochverfügbar
 * Sicherheit kryptografischer Primitive: AES-256, SHA-256 und Kyber sind bis zu einem ausreichenden Sicherheitslevel quantenresistent
+
+## Nicht-Ziele
+
+Um die Grenzen der Schutzziele aufzuzeigen, benennen wir außerdem Einschränkungen des Systems, die bewusst ungeschützt
+bleiben. Die Alternative, diese Einschränkungen auszuschließen, ist nur mit anderen Einschränkungen realisierbar, die
+etwa die Wartbarkeit, Bedienbarkeit oder Performanz des Systems betreffen. Einzelne Nicht-Ziele können später in Ziele
+geändert werden, dies hat allerdings weitreichende Folgen und erfordert teils signifikante Anpassungen am Konzept.
+
+* Es werden keine besonderen Maßnahmen getroffen, um gegen einen aktiv angreifenden Applikationsserver zu verteidigen
+* Die Vertraulichkeit und Integrität des gesamten Boards wird nicht sichergestellt, insb. betrifft dies die Metadaten von 
+  Post-its (Position, Größe, Farbe, Verknüpfungen, Version)
+  * Der Server kann also bspw. Post-its verschieben oder alte Post-its anzeigen
+* Keine Authentizität oder Deniability: Die eindeutige Urheberschaft eines Post-its muss nicht sichergestellt werden
+  * Nutzer haben also keine Möglichkeit zu bestimmen oder abzustreiten, wer ein bestimmtes Post-it verfasst hat
+  * Nutzer haben außerdem keine Möglichkeit zu bestimmen oder abzustreiten, wer einen bestimmten Board Key ausgestellt hat 
+* Keine Backward Secrecy: eingeladene Nutzer erhalten Einsicht auf alle bisher geteilten Daten
+* Keine Forward Secrecy: wenn ein Angreifer Zugriff auf einen Board Key erhält, erhält er damit Zugriff auf alle 
+  Post-it-Inhalte, die unter diesem Board Key verschlüsselt werden.
 
 [^1]: Bezüglich allen Daten außer dem Passwort. Aufgrund des bisherigen Aufbaus von neXboard müssen sich Nutzer
 mit Nutzername und Passwort am Server anmelden. Im beschriebenen System nimmt das Passwort aber auch eine sicherheitskritische

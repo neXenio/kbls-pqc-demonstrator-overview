@@ -18,7 +18,7 @@ Ergebnis des hybriden Schlüsseleinigungsverfahrens ist, dass zwei Kommunikation
 ausgetauscht haben. Dieses Verfahren ist generisch konzipiert, d.h. es kann für verschiedene Use Cases verwendet werden.
 
 Im Kontext von neXboard wird dieses Schlüsselmaterial dafür verwendet, einen sogenannten Board key zu verschlüsseln. Der
-Board key wiederum wird verwendet, um die Inhalte aller Post-Its im Board zu schützen. Der Board key ist also ein data
+Board key wiederum wird verwendet, um die Inhalte aller Post-its im Board zu schützen. Der Board key ist also ein data
 encryption key (DEK), weil dieser Daten verschlüsselt. Das zwischen Alice und Bob ausgetauschte Schlüsselmaterial ist
 ein key encryption key (KEK), weil dieser den (data encryption) key verschlüsselt.
 
@@ -108,15 +108,15 @@ Bemerkungen:
   gemeinsam mit `encrypted_secret_key` beim Server gespeichert
 * der Wert `sha256(public_key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen
 
-## Schutz der Post-It Inhalte im neXboard
+## Schutz der Post-it Inhalte im neXboard
 
-Die Inhalte der Post-Its werden unter dem aktuellen Board key verschlüsselt. Dafür wird ein zufälliger 12-Byte Initialisierungsvektor
+Die Inhalte der Post-its werden unter dem aktuellen Board key verschlüsselt. Dafür wird ein zufälliger 12-Byte Initialisierungsvektor
 `iv` genutzt.
 
 * `iv                       = prng(12)`
 * `encrypted_postit_content = aes256gcm(postit_content, board_key, iv)`
 
-Jedes Post-It hat eine eindeutige ID `postit_id` und jede Änderung des Post-Its ist mit einem eindeutigen Zeitstempel `ts`
+Jedes Post-it hat eine eindeutige ID `postit_id` und jede Änderung des Post-its ist mit einem eindeutigen Zeitstempel `ts`
 versehen, welche der Server unverschlüsselt als Metadaten abspeichert.
 
 ## Diskussion des Modus für die Verschlüsselung
