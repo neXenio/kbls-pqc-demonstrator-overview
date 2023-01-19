@@ -403,6 +403,16 @@ id2_target = sha256(rsa_public_key_bob)
 > unabhängig voneinander durchgeführt. Insbesondere wird für jeden Board Key ein neuer Durchlauf des KEM-Verfahrens durchgeführt.
 > Dadurch sind alle `key_encryption_key`s unterschiedlich und der IV kann statisch sein.
 
+## Boards öffentlich teilen
+
+Dieses Konzept verteidigt explizit nicht gegen einen bösartigen Server. Daher ist die Möglichkeit, Boards öffentlich zu
+teilen, aus kryptografischer und UX-Sicht unbedenklich. Aus technischer Sicht entspricht dies dem Szenario, das Board mit
+dem Server zu teilen, welcher hierfür eigenes Board-spezifisches Schlüsselmaterial generiert (siehe dazu den Workflow
+["Schlüsselpaare registrieren"](#schlsselpaare-registrieren)). Nutzer:innen mit Zugang zum öffentlichen Link erhalten Zugriff 
+zum Board-spezifischen Schlüsselmaterial des Servers und damit zu den Inhalten des Boards. Wenn der öffentliche Link 
+deaktiviert wird, entspricht dies dem Workflow für ["Zugriffsrechte für ein Board entziehen"](#zugriffsrechte-fr-ein-board-entziehen), 
+wobei hier dem Server die Zugriffsrechte entzogen werden.
+
 ## Zugriffsrechte für ein Board entziehen
 
 Wenn Nutzer:innen die Zugriffsrechte entzogen werden, müssen alle künftigen Post-it-Inhalte auf eine andere Weise
