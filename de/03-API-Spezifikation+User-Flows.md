@@ -59,6 +59,13 @@ iv                    = sha256(public key)
 encrypted private key = aes256gcm(private key, encryption key, iv)
 ```
 
+> Bemerkungen:
+> * Dieser Ansatz erlaubt einen Offline-Angriff auf das `user_password` durch den Server oder jemanden, der den Server 
+>   kompromittiert. PBKDF2 sollte so konfiguriert werden, dass solche Angriffe besonders ineffizient werden (bspw. durch 
+>   mindestens 100.000 interne Iterationen - lieber noch mehr). Darüber hinaus sollten Nutzer:innen dazu angehalten werden, 
+>   sichere Passwörter zu verwenden (keine Wiederverwendung, hohe Entropie). Nicht zuletzt ist ein wichtiger Schutzmechanismus
+>   an dieser Stelle das Vertrauen, dass der Server nicht bösartig handelt und vor Angriffen geschützt ist.
+
 3. Ergebnis als DTO encodieren (beispielhaft für Kyber)
 
 ```json

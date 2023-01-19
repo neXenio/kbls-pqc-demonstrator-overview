@@ -13,6 +13,7 @@ In this way, we test and demonstrate the functionality, usability, and performan
 * [Context and Scope](./01-Context-and-Scope.md)
 * [Proposed Architecture](./02-Proposed-Architecture.md)
 * [API Specification + User Flows](./03-API-Specification+User-Flows.md)
+* [Considerations for Further Development](./04-Considerations-for-Further-Development.md)
 
 ## Outlook
 
