@@ -70,6 +70,13 @@ encrypted_private_key = aes256gcm.encrypt(private_key, encryption_key, iv)
 >   String mit dem Salt konkateniert (`||`).
 > * Der Wert `sha256(public_key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
+> Bemerkungen:
+> * Dieser Ansatz erlaubt einen Offline-Angriff auf das `user_password` durch den Server oder jemanden, der den Server 
+>   kompromittiert. PBKDF2 sollte so konfiguriert werden, dass solche Angriffe besonders ineffizient werden (bspw. durch 
+>   mindestens 100.000 interne Iterationen - lieber noch mehr). Darüber hinaus sollten Nutzer:innen dazu angehalten werden, 
+>   sichere Passwörter zu verwenden (keine Wiederverwendung, hohe Entropie). Nicht zuletzt ist ein wichtiger Schutzmechanismus
+>   an dieser Stelle das Vertrauen, dass der Server nicht bösartig handelt und vor Angriffen geschützt ist.
+
 3. Ergebnis als DTO encodieren (beispielhaft für Kyber)
 
 ```json

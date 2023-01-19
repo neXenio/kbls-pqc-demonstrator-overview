@@ -20,6 +20,7 @@ sowie anderseits die Praktikabilität eines hybriden Schlüsseleinigungsverfahre
 * [Kontext und Umfang](./01-Kontext-und-Umfang.md)
 * [Vorgesehene Architektur](./02-Vorgesehene-Architektur.md)
 * [API Spezifikation + User Flows](./03-API-Spezifikation+User-Flows.md)
+* [Überlegungen zur Weiterentwicklung](./04-Ueberlegungen-zur-Weiterentwicklung.md)
 
 ## Ausblick
 
