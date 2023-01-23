@@ -89,7 +89,7 @@ geändert werden, dies hat allerdings weitreichende Folgen und erfordert teils s
   * Nutzer:innen haben außerdem keine Möglichkeit zu bestimmen oder abzustreiten, wer einen bestimmten Board Key ausgestellt
     hat
 * Keine Backward Secrecy: eingeladene Nutzer:innen erhalten Einsicht auf alle bisher geteilten Daten
-* Begrenzte Forward Secrecy: wenn eine Angreifer:in Zugriff auf einen Board Key erhält, erhält er damit Zugriff auf alle
+* Begrenzte Forward Secrecy: wenn eine Angreifer:in Zugriff auf einen Board Key erhält, erhält sie damit Zugriff auf alle
   Post-it-Inhalte, die unter diesem Board Key verschlüsselt werden. Insbesondere werden ihr auch neue Post-it-Inhalte zugänglich,
   welche nach der Kompromittierung, aber vor dem Ausschluss anderer Nutzer:innen, erstellt werden.
 
@@ -99,8 +99,8 @@ Rolle beim Zwischenspeicher von privaten Nutzerschlüsseln ein. Daher wird der n
 implementiert: einen Auth-Server, der das Nutzerpasswort beim Login erhält, und den Applikationsserver, welcher das Nutzerpasswort
 nie erhält. Unter der Annahme eines ehrlichen Auth-Servers (Angriffsoberfläche ist geringer, da kein Nutzerinput außer UserID
 und Passwort verarbeitet wird und nur Login-Funktionalität umgesetzt werden muss), gilt für den Applikationsserver das erwähnte
-Angriffsmodell eines passiven (honest-but-curious) Angreifers. Damit wird ein stärkeres Angriffsmodell abgesichert als im
-Normalfall des nicht hybriden neXboards, in welchem beide Komponenten des Servers als ehrlich betrachtet werden müssen.
+Angriffsmodell einer passiven (honest-but-curious) Angreifer:in. Damit wird ein stärkeres Angriffsmodell abgesichert als
+im Normalfall des nicht hybriden neXboards, in welchem beide Komponenten des Servers als ehrlich betrachtet werden müssen.
 
 [^2]: Solange das Frontend Teil der Applikation ist, verbleibt dieser Angriffsvektor dem neXboard inhärent. Würden ausschließlich
 "statische" Clients, zum Beispiel Smartphone-Applikationen genutzt, so ließe sich das Risiko durch die Veröffentlichung
