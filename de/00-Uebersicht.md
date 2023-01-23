@@ -9,8 +9,8 @@ zu schützen, ohne die interaktiven Möglichkeiten des Boards einzuschränken.
 
 Zu diesem Zweck wird für jedes Board ein sogenannter Board Key erstellt, der die Post-its symmetrisch verschlüsselt. Der
 Board Key selbst wird so verschlüsselt, dass er mit beliebig vielen Nutzer:innen mit Zugriffsrechten geteilt werden kann
-und quantenresistent geschützt ist. Werden einigen Nutzer:innnen die Zugriffsrechte entzogen werden, ändert sich der Board
-Key, damit alle zukünftigen Inhalte geschützt sind.
+und quantenresistent geschützt ist. Werden einigen Nutzer:innnen die Zugriffsrechte entzogen, ändert sich der Board Key,
+damit alle zukünftigen Inhalte geschützt sind.
 
 Auf diese Weise prüfen und zeigen wir einerseits die Funktionalität, Bedienbarkeit und Performanz der Kryptobibliothek botan,
 sowie anderseits die Praktikabilität eines hybriden Schlüsseleinigungsverfahrens.

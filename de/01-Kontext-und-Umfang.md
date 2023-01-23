@@ -89,8 +89,9 @@ geändert werden, dies hat allerdings weitreichende Folgen und erfordert teils s
   * Nutzer:innen haben außerdem keine Möglichkeit zu bestimmen oder abzustreiten, wer einen bestimmten Board Key ausgestellt
     hat
 * Keine Backward Secrecy: eingeladene Nutzer:innen erhalten Einsicht auf alle bisher geteilten Daten
-* Keine Forward Secrecy: wenn ein Angreifer Zugriff auf einen Board Key erhält, erhält er damit Zugriff auf alle
-  Post-it-Inhalte, die unter diesem Board Key verschlüsselt werden.
+* Begrenzte Forward Secrecy: wenn eine Angreifer:in Zugriff auf einen Board Key erhält, erhält er damit Zugriff auf alle
+  Post-it-Inhalte, die unter diesem Board Key verschlüsselt werden. Insbesondere werden ihr auch neue Post-it-Inhalte zugänglich,
+  welche nach der Kompromittierung, aber vor dem Ausschluss anderer Nutzer:innen, erstellt werden.
 
 [^1]: Bezüglich allen Daten außer dem Passwort. Aufgrund des bisherigen Aufbaus von neXboard müssen sich Nutzer
 mit Nutzername und Passwort am Server anmelden. Im beschriebenen System nimmt das Passwort aber auch eine sicherheitskritische

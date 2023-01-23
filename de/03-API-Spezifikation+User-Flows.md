@@ -61,17 +61,14 @@ iv                    = sha256(public_key)
 encrypted_private_key = aes256gcm.encrypt(private_key, encryption_key, iv)
 ```
 
-Bemerkungen:
-
-* Die Berechnung passiert jeweils für Kyber und RSA mit den spezifischen Schlüsseln und Salts.
-* Die zum Einsatz kommenden kryptografischen Funktionen sind PBKDF2, AES-256 im Galois-Counter-Modus (AES-GCM) und im
-  Counter-Modus (AES-CTR) sowie SHA-256.
-* Der Wert `salt` besteht aus 16 Bytes, die von einem geeigneten Zufallszahlengenerator erstellt wurden, und wird
-  gemeinsam mit `encrypted_private_key` beim Server gespeichert.
-* Der konstante String `encryptPrivateKeys` wird genutzt, um eine Domänenseparierung zugewährleisten, damit ein zum Beispiel
-  beim Auth-Server gespeicherter PBKDF2-Passworthash nicht dem symmetrischen `encryption_key` entspricht. Dazu wird der
-  String mit dem Salt konkateniert (`||`).
-* Der Wert `sha256(public_key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
+> * Die Berechnung passiert jeweils für Kyber und RSA mit den spezifischen Schlüsseln und Salts.
+> * Die zum Einsatz kommenden kryptografischen Funktionen sind PBKDF2, AES-256 im Galois-Counter-Modus (AES-GCM) sowie SHA-256.
+> * Der Wert `salt` besteht aus 16 Bytes, die von einem geeigneten Zufallszahlengenerator erstellt wurden, und wird
+>   gemeinsam mit `encrypted_private_key` beim Server gespeichert.
+> * Der konstante String `"encryptPrivateKeys"` wird genutzt, um eine Domänenseparierung zugewährleisten, damit ein zum Beispiel
+>   beim Auth-Server gespeicherter PBKDF2-Passworthash nicht dem symmetrischen `encryption_key` entspricht. Dazu wird der
+>   String mit dem Salt konkateniert (`||`).
+> * Der Wert `sha256(public_key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 3. Ergebnis als DTO encodieren (beispielhaft für Kyber)
 
@@ -96,13 +93,13 @@ Bemerkungen:
 > Das `encryption_salt` für die Verschlüsselung des `private_key`s ist aus kryptografischer Sicht an dieser Stelle
 > redundant und unpräzise benannt:
 >
-> * Die resultierenden `encryption_key`s werden nur je einmal verwendet. Deshalb kann der IV hier ohne Sicherheitsbedenken
+> * Die resultierenden `encryption_key`s werden jeweils nur einmal verwendet. Deshalb kann der IV hier ohne Sicherheitsbedenken
 >   statisch je Schlüsselpaar sein und das Salt für PBKDF2 aus dem `public_key` abgeleitet werden (bspw.
 >   `sha256(public_key)`). Somit ist ein separates `encryption_salt` technisch nicht erforderlich.
 > * Das Salt wird für PBKDF2 verwendet, nicht für die Verschlüsselung. Das Verschlüsseln bedingt aber PBKDF2 und damit das
 >   Salt.
 > * Damit ein Passworthash mit PBKDF2, der in einem anderen Kontext genutzt wird, nicht zufällig dem `encryption_key` entspricht,
->   wird der konstante String `encryptPrivateKeys` dem Salt vorangestellt.
+>   wird der konstante String `"encryptPrivateKeys"` dem Salt vorangestellt.
 >
 > Wir verwenden an dieser Stelle trotzdem ein separates Salt, um einerseits versehentlichen Fehlern an anderer Stelle
 > vorzubeugen und andererseits weitere Verschlüsselungsmodi ohne API-Anpassungen zu ermöglichen.
