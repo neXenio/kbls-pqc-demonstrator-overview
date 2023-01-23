@@ -119,7 +119,7 @@ sogenannte AEADs genutzt.
 
 Für den Anwendungsfall des neXboards sind die herkömmlichen AEADs leider nicht ohne Abstriche nutzbar. Insbesondere hat GCM
 nicht die Eigenschaft, dass ein Ciphertext ausschließlich unter einem Schlüssel erfolgreich entschlüsselbar ist. Im Speziellen
-ist es für einen Angreifer sogar leicht, zwei Schlüssel zu kreieren, die einen gemeinsamen Ciphertext jeweils zu einem potenziell
+ist es für Angreifer:innen sogar leicht, zwei Schlüssel zu kreieren, die einen gemeinsamen Ciphertext jeweils zu einem potenziell
 sinnhaften Klartext entschlüsseln. Bei einem kollaborativen Board, in welches Nutzer:innen eigens verschlüsselte Nachrichten
 hochladen und den symmetrischen Schlüssel jeweils an die Empfänger:innen asymmetrisch verschlüsseln, kann diese Eigenschaft
 offensichtlich schadhaft genutzt werden. Dies gilt auch trotz der nicht gänzlichen freien Wahl der symmetrischen Schlüssel
