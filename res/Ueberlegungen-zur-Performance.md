@@ -8,7 +8,7 @@ mit dem selben KEK verschlüsselt, sondern separate KEKs mit unterschiedlichen S
 KDF mehrfach berechnet wird.
 
 Eine performantere Konstruktion, die sowohl unterschiedliche Schlüssel, eine Härtung durch zufälliges Salt und lange Ableitzeit
-umsetzt wäre die Ableitung eines Master-Schlüssels auf Basis des Passworts und die Ableitung spezifischer Schlüssel durch
+umsetzt, wäre die Ableitung eines Master-Schlüssels auf Basis des Passworts und die Ableitung spezifischer Schlüssel durch
 eine schnelle KDF mit Domänenseparierung:
 
 ```python

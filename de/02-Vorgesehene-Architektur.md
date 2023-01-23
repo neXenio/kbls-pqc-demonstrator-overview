@@ -95,7 +95,7 @@ erhalten.
 
 Private Schlüssel müssen geschützt werden. Eine Option besteht darin, die privaten Schlüssel lokal bei den Nutzer:innen
 zu speichern. Da viele Nutzer:innen das neXboard von verschiedenen Geräten aus erreichen wollen, ist diese Option nicht
-ohne weiteres umsetzbar. Für bessere Usability werden die privaten Schlüssel stattdessen verschlüsselt beim Server gespeichert.
+ohne weiteres umsetzbar. Für bessere Bedienbarkeit werden die privaten Schlüssel stattdessen verschlüsselt beim Server gespeichert.
 Der symmetrische Schlüssel für diese Verschlüsselung leitet sich aus dem individuellen Passwort sowie zusätzlicher Entropie
 ab. Der konkrete Prozess wird in der [API Spezifikation](03-API-Spezifikation%2BUser-Flows.md#Schlüsselpaare-registrieren)
 beschrieben.
@@ -105,8 +105,8 @@ beschrieben.
 Die Inhalte der Post-its werden unter dem aktuellen Board Key verschlüsselt. Der konkrete Prozess wird in der [API Spezifikation](03-API-Spezifikation%2BUser-Flows.md#Board-bearbeiten)
 beschrieben.
 
-Jedes Post-it hat eine eindeutige ID `postit_id` und jede Änderung des Post-its ist mit einem eindeutigen Zeitstempel `ts`
-versehen, welche der Server unverschlüsselt als Metadaten abspeichert. Um beim Prozess [Zugriffsrechte für ein Board entziehen](03-API-Spezifikation%2BUser-Flows.md#Zugriffsrechte-für-ein-Board-entziehen)
+Jedes Post-it hat eine eindeutige ID und jede Änderung des Post-its ist mit einem eindeutigen Zeitstempel versehen, welche
+der Server unverschlüsselt als Metadaten abspeichert. Um beim Prozess [Zugriffsrechte für ein Board entziehen](03-API-Spezifikation%2BUser-Flows.md#Zugriffsrechte-für-ein-Board-entziehen)
 nicht viele Daten umschlüsseln zu müssen, können mehrere Board Keys parallel existieren, von denen aber nur mittels des
 neusten Inhalte verändert oder hinzugefügt werden können.
 
@@ -128,16 +128,16 @@ kann eine simple Encrypt-Then-HMAC-Konstruktion genutzt werden, um dieses Proble
 bedingt jedoch einen Master-Schlüssel, der zur kollisions-resistenten Ableitung zweier Unter-Schlüssel genutzt wird. Da
 kein "Opening" vonnöten ist, ist die im Paper dargelegte "multiple-opening security" nicht notwendig.
 
-Betrachten wir den Fall mit GCM erneut: Soll das Post-It unter beiden Schlüssel sinnhaft sein, muss es (da es nur einen Ciphertext
+Betrachten wir den Fall mit GCM erneut: Soll das Post-it unter beiden Schlüssel sinnhaft sein, muss es (da es nur einen Ciphertext
 gibt) ein sinnhaftes Klartextpaar geben, dessen bitweise Differenz exakt der bitweisen Differenz der Keystreams (GCM basiert
 auf dem CTR-Modus) entspricht. Entsprechend ist der Angriff für lange Klartexte nicht trivial. Da bei einem Angriff im Schritt
 des Lösens des GHASH-Polynoms jeweils ein Ciphertextblock gezielt gewählt werden muss, um den gemeinsamen Tag korrekt zu
-erhalten, skaliert der Angriff weiterhin umso schlechter auf mehrere Post-Its und könnte bei entsprechendem Textvolumen nicht
-praktikabel sein. Dagegen könnten durch Implementierungsentscheidungen eines Clients Post-Its mit nicht druckbaren Zeichen
+erhalten, skaliert der Angriff weiterhin umso schlechter auf mehrere Post-its und könnte bei entsprechendem Textvolumen nicht
+praktikabel sein. Dagegen könnten durch Implementierungsentscheidungen eines Clients Post-its mit nicht druckbaren Zeichen
 nicht angezeigt und somit der Angriff praktisch doch ermöglicht werden. Darüber hinaus können bösartige Nutzer:innen direkt
-vor und nach einem Angriff auf ein einzelnes Post-It eine Key-Rotation bewirken, wodurch in jedem Fall ein gezielter Angriff
+vor und nach einem Angriff auf ein einzelnes Post-it eine Key-Rotation bewirken, wodurch in jedem Fall ein gezielter Angriff
 möglich ist.
 
-Entsprechend entscheiden wir uns im neXboard bei der Verschlüsselung von Post-It-Inhalten dazu, nicht den AEAD GCM zu nutzen,
+Entsprechend entscheiden wir uns im neXboard bei der Verschlüsselung von Post-it-Inhalten dazu, nicht den AEAD GCM zu nutzen,
 sondern verwenden stattdessen eine Encrypt-Then-HMAC-Konstruktion (CTR + HMAC). Für andere Anwendungsfälle, in denen die
 Eigenschaft des Key-Commitments nicht entscheidend ist, wird hingegen GCM eingesetzt.
