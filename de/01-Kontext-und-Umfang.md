@@ -67,8 +67,8 @@ dann ist das Schutzziel nicht erfüllt.
 
 * Server ist "honest-but-curious"[^1], das heißt er wird nicht aktiv versuchen die Kommunikation zu verändern, ihm wird aber
 nicht bezüglich der Vertraulichkeit vertraut. Insbesondere auch:
-  * Integrität der Client-Applikation: Der Server liefert das Frontend unverändert aus und verändert nicht die für die Clients
-  gespeicherten Daten
+  * Integrität der Client-Applikation: Der Server liefert das Frontend unverändert aus[^2] und verändert nicht die für die
+  Clients gespeicherten Daten
   * Vollständigkeit: Dem Server wird vertraut, keine Post-its zu unterschlagen
 * Verfügbarkeit: der neXboard-Server ist hochverfügbar
 * Sicherheit kryptografischer Primitive: AES-256, SHA-256 und Kyber sind bis zu einem ausreichenden Sicherheitslevel quantenresistent
@@ -101,3 +101,9 @@ nie erhält. Unter der Annahme eines ehrlichen Auth-Servers (Angriffsoberfläche
 und Passwort verarbeitet wird und nur Login-Funktionalität umgesetzt werden muss), gilt für den Applikationsserver das erwähnte
 Angriffsmodell eines passiven (honest-but-curious) Angreifers. Damit wird ein stärkeres Angriffsmodell abgesichert als im
 Normalfall des nicht hybriden neXboards, in welchem beide Komponenten des Servers als ehrlich betrachtet werden müssen.
+
+[^2]: Solange das Frontend Teil der Applikation ist, verbleibt dieser Angriffsvektor dem neXboard inhärent. Würden ausschließlich
+"statische" Clients, zum Beispiel Smartphone-Applikationen genutzt, so ließe sich das Risiko durch die Veröffentlichung
+des Quellcodes und der Möglichkeit des Selber-Bauens reduzieren. Da neXboard jedoch insbesondere Web-Clients unterstützt,
+kann diese Mitigation nicht realisiert werden und das neXboard kann keine Sicherheit gegen einen aktiv bösartigen Server
+erreichen.
