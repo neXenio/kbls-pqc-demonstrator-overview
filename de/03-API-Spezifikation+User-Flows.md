@@ -468,3 +468,10 @@ TODO: image
 > unzugänglich zu machen, wird also erst mit etwas Verzögerung technisch durchgesetzt.
 >
 > Nach Schritt 9 müssen alle Clients den neuen Board Key beim Server erfragen, siehe dazu den Workflow [Board öffnen](#board-öffnen).
+
+> Da in [Board mit anderen Nutzer:innen teilen](#board-mit-anderen-nutzerinnen-teilen) alle Board Keys für die neuen Nutzer:innen
+> verschlüsselt werden, könnte es bei naiver Implementierung dazu kommen, dass nach dem Hinzufügen von Nutzer Xavier durch
+> Nutzerin Alice und dem gleichzeitigen Entfernen von Nutzerin Yve durch Nutzer Bob, Xavier keinen Zugriff auf den von Bob
+> erstellten neuen Board Key erhält. Der Zustand wäre nicht sicherheitskritisch, da er weniger Zugriff als erwartet verteilt,
+> ist aber aus Gesichtspunkten der Bedienbarkeit offensichtlich unerwünscht. Deshalb implementiert neXboard ein geeignetes
+> Locking-Verfahren, dass parallele Änderungen an der Menge der Nutzer:innen eines Boards verhindert oder geeignet auflöst.
