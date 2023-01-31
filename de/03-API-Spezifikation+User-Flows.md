@@ -405,13 +405,25 @@ id2_target = sha256(rsa_public_key_bob)
 
 ## Boards öffentlich teilen
 
-Dieses Konzept verteidigt explizit nicht gegen einen bösartigen Server. Daher ist die Möglichkeit, Boards öffentlich zu
-teilen, aus kryptografischer und UX-Sicht unbedenklich. Aus technischer Sicht entspricht dies dem Szenario, das Board mit
-dem Server zu teilen, welcher hierfür eigenes Board-spezifisches Schlüsselmaterial generiert (siehe dazu den Workflow
-["Schlüsselpaare registrieren"](#schlsselpaare-registrieren)). Nutzer:innen mit Zugang zum öffentlichen Link erhalten Zugriff 
-zum Board-spezifischen Schlüsselmaterial des Servers und damit zu den Inhalten des Boards. Wenn der öffentliche Link 
-deaktiviert wird, entspricht dies dem Workflow für ["Zugriffsrechte für ein Board entziehen"](#zugriffsrechte-fr-ein-board-entziehen), 
-wobei hier dem Server die Zugriffsrechte entzogen werden.
+Das öffentliche Teilen eines Boards ist eine zusätzliche Funktion, die neXboard bietet. Diese Funktion gehört nicht zu den 
+Kernfunktionalitäten dieses Konzepts, steht im Widerspruch zu allen Schutzzielen und kann nur auf Kosten der Leistung
+implementiert werden. Sie sollte daher sparsam eingesetzt werden.
+
+Beim öffentlichen Teilen eines Boards entfällt der Anspruch an seine Vertraulichkeit und Integrität, da nun Lese- und 
+Schreib-Zugriff aufs Board beliebig verteilt werden können. Insbesondere kann auch der Server solchen Zugriff erhalten.
+Um ein Board öffentlich zu teilen, wird es daher zunächst mit dem Server geteilt, welcher hierfür eigenes Board-spezifisches 
+Schlüsselmaterial generiert (siehe dazu den Workflow ["Schlüsselpaare registrieren"](#schlüsselpaare-registrieren)). 
+Nutzer:innen mit Zugang zum öffentlichen Link erhalten Zugriff zum Board-spezifischen Schlüsselmaterial des Servers und 
+damit zu den Inhalten des Boards. Wenn der öffentliche Link deaktiviert wird, entspricht dies dem Workflow für 
+["Zugriffsrechte für ein Board entziehen"](#zugriffsrechte-für-ein-board-entziehen), wobei hier dem Server die Zugriffsrechte 
+entzogen werden.
+
+> Anmerkung: der Server agiert bei diesem Ansatz als Proxy für alle Nutzer:innen, die den öffentlichen Link zum Board
+> kennen. Dies kann schnell zum Bottleneck werden und Debugging erschweren, daher sollten weitere Maßnahmen getroffen werden:
+> * Alias für die Nutzer:innen erfassen
+> * zusätzlicher Schutz des Links durch Passwort oder Ablaufdatum
+> * Anzahl paralleler Nutzer:innen begrenzen
+> * nur Lese-Zugriff erlauben
 
 ## Zugriffsrechte für ein Board entziehen
 
