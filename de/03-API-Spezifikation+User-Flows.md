@@ -163,7 +163,7 @@ id2 = sha256(rsa_public_key_user)
 
 7. Board Encryption Data DTO an den Server schicken
 
-<!-- https://excalidraw.com/#json=38wASZUZnfYZfS-CU7fbr,vsS5ibgrnu98--QbzRuJOg -->
+<!-- https://excalidraw.com/#json=_Gr_3et1YlCPk8a0_dK7O,tsi_E4CB4UnCOKEBGRU3Dw -->
 ![Erstellung eines Boards](../images/03-03-create-board.png)
 
 ## Board bearbeiten
@@ -210,7 +210,7 @@ board_key_id             = sha256(board_key)
 > Im Gegensatz dazu stellt die UUID einen [künstlichen Schlüssel](https://en.wikipedia.org/wiki/Surrogate_key) dar.
 
 3. Änderungen aggregieren und an den Server schicken
-<!-- https://excalidraw.com/#json=x04kjo7fDurdefJud1BaL,ptFPOFhUBPh734af8HsoEA -->
+<!-- https://excalidraw.com/#json=2Pcid6KT0qRRxur-rGujX,cw6Gc_DXPH9AWOQqwk2G2w -->
 ![Bearbeitung eines Boards](../images/03-04-edit-board.png)
 
 > Der Endpunkt `/events/{boardId}` wird verwendet, um Post-it-Inhalte an den Server zu schicken. Jede Erstellung oder
@@ -236,6 +236,7 @@ erforderlich und andererseits der verschlüsselte Board Key. Alice holt sich bei
 
 1. Abrufen der hybriden Schlüsselpaare beim Server
 
+<!-- https://excalidraw.com/#json=CQsHUH2fqRvj5dkWqDrfb,XwEv0EoCLbBJSYJUYGpoAw -->
 ![Abrufen der hybriden Schlüsselpaare](../images/03-05-01-get-keys.png)
 
 ```python
@@ -246,6 +247,10 @@ encrypted_kyber_private_key = hybrid_key_pair.keyPair1.encryptedPrivateKey
 rsa_public_key              = hybrid_key_pair.keyPair2.publicKey.pkBase64
 encrypted_rsa_private_key   = hybrid_key_pair.keyPair2.encryptedPrivateKey
 ```
+
+> Anmerkung: die Angabe der E-Mail-Adresse in der URL ist hier nur beispielhaft, eine auf Sicherheit bedachte Implementierung
+> sollte diese Information schützen. Dies ist beispielsweise möglich durch die Verwendung von UUIDs für `userId` oder indem
+> die E-Mail-Adresse im Request body übergeben wird.
 
 2. Entschlüsseln der privaten Schlüssel
 
@@ -274,7 +279,7 @@ rsa_private_key       = aes256gcm.decrypt(rsa_ciphertext, rsa_encryption_key, rs
 
 3. Abrufen aller für Alice verschlüsselten Board Keys beim Server, weitere Schritte exemplarisch für den ersten Board Key
 
-<!-- https://excalidraw.com/#json=7Fs0Y5gdtBuNnxkAH691l,sjVN6hkazAJr8MLX32IkZA -->
+<!-- https://excalidraw.com/#json=9y47_3FI5hAhwlSmuZwky,3RQOgtO9kyJQNXRsj2BAHg -->
 ![Abrufen eines Boards](../images/03-05-03-get-boards.png)
 
 ```python
@@ -310,7 +315,7 @@ board_key_id  = sha256(board_key)
 
 5. Abrufen aller Post-it-Inhalte beim Server mit anschließender MAC-Validierung und Entschlüsselung
 
-<!-- https://excalidraw.com/#json=VtA_sS3ON0MswyHYhO4gO,RE1zG5GBnTNcUvPZWTDgSw -->
+<!-- https://excalidraw.com/#json=HLgMPuJHEfTYKnTRgMp7O,FTQWYGJQEEAlQm2ycF1hVA -->
 ![Abrufen aller Post-it-Inhalte](../images/03-05-05-get-events.png)
 
 ```python
@@ -389,7 +394,7 @@ id2_target = sha256(rsa_public_key_bob)
 
 7. Board Encryption Data DTO an den Server schicken
 
-<!-- https://excalidraw.com/#json=WzorYgkbf6BKiXkjitVzJ,Gi-jFrDww1BXTYq_ddmtgg -->
+<!-- https://excalidraw.com/#json=sZIO9HkI5-zdr6OW1Xb7C,Kf9d-e9PDS80VbS2aWX03g -->
 ![Board mit anderen Nutzer:innen teilen](../images/03-06-share-board.png)
 
 > Dieser Prozess wird für alle im Board genutzten Board Keys durchgeführt. Dabei werden die Verschlüsselungen analog, aber
@@ -467,26 +472,24 @@ id2 = sha256(rsa_public_key_user)
   "boardId": "77c8be2d-9895-45ae-96da-b7234a210c4c",
   "source": { "id1": "59ec81ac05fdc91...", "id2": "06fafdfcc94157d..." },
   "target": { "id1": "59ec81ac05fdc91...", "id2": "06fafdfcc94157d..." },
-  "encryptedBoardKey": "mW4mDrwpDcSvOBEDgBzN7DGKLd+FtRZViAIrDUCe3RTxNILBpv1kWQ==",
+  "encryptedBoardKey": "5oM1/ifWoEtHFOFfAtEqBaxrtaUo4kbOyBugx+BXY5umydX2uzt5iw==",
   "hybridEncryptionMode": "KYBER_768_RSA_4096",
-  "encapsulatedKdfInput1": "MIIE4zCBlwYJKoZIhvcNAQMBMIGJAkEA...",
-  "encapsulatedKdfInput2": "b5fwR9PJzjrA6TEx9ukiUXxvCSZp2h2e..."
+   "encapsulatedKdfInput1": "SCK275S3OHr1oTSeacxwg4SuBzHnnwNZ...",
+   "encapsulatedKdfInput2": "7c1XMG0qGjU3XT0eybIXH1oHlVIAdMsj..."
 }
 ```
 
 7. Board Encryption Data DTO an den Server schicken
 
-```
-TODO: image
-```
+<!-- https://excalidraw.com/#json=ySe5gpwX7floIwkKN6dGo,B8KCa2-Ngtii24UEEC1uWw -->
+![Zugriffsrechte entziehen](../images/03-07-01-key-rotation.png)
 
 8. Schritte 2-7 für alle Nutzer:innen mit Zugriffsrechten wiederholen - exklusive aller Nutzer:innen, deren Zugriffsrechte
    entzogen wurden.
 9. Server informieren, dass der Board Key gewechselt wurde
 
-```
-TODO: image
-```
+<!-- https://excalidraw.com/#json=ZMGQvkOaSupBLC5mCXSuU,l37K8on9DfLKWxlZ79Q8HQ -->
+![Zugriffsrechte entziehen](../images/03-07-02-key-rotation.png)
 
 > Schritt 9 stellt sicher, dass der alte Board Key nicht weiterhin benutzt wird. Anschließend verhindert der Server das
 > Hinzufügen von Änderungen, die unter einem anderen Board Key verschlüsselt wurden.
