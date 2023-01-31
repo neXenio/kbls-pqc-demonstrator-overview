@@ -403,6 +403,28 @@ id2_target = sha256(rsa_public_key_bob)
 > unabhängig voneinander durchgeführt. Insbesondere wird für jeden Board Key ein neuer Durchlauf des KEM-Verfahrens durchgeführt.
 > Dadurch sind alle `key_encryption_key`s unterschiedlich und der IV kann statisch sein.
 
+## Boards öffentlich teilen
+
+Das öffentliche Teilen eines Boards ist eine zusätzliche Funktion, die neXboard bietet. Diese Funktion gehört nicht zu den 
+Kernfunktionalitäten dieses Konzepts, steht im Widerspruch zu allen Schutzzielen und kann nur auf Kosten der Leistung
+implementiert werden. Sie sollte daher sparsam eingesetzt werden.
+
+Beim öffentlichen Teilen eines Boards entfällt der Anspruch an seine Vertraulichkeit und Integrität, da nun Lese- und 
+Schreib-Zugriff aufs Board beliebig verteilt werden können. Insbesondere kann auch der Server solchen Zugriff erhalten.
+Um ein Board öffentlich zu teilen, wird es daher zunächst mit dem Server geteilt, welcher hierfür eigenes Board-spezifisches 
+Schlüsselmaterial generiert (siehe dazu den Workflow ["Schlüsselpaare registrieren"](#schlüsselpaare-registrieren)). 
+Nutzer:innen mit Zugang zum öffentlichen Link erhalten Zugriff zum Board-spezifischen Schlüsselmaterial des Servers und 
+damit zu den Inhalten des Boards. Wenn der öffentliche Link deaktiviert wird, entspricht dies dem Workflow für 
+["Zugriffsrechte für ein Board entziehen"](#zugriffsrechte-für-ein-board-entziehen), wobei hier dem Server die Zugriffsrechte 
+entzogen werden.
+
+> Anmerkung: der Server agiert bei diesem Ansatz als Proxy für alle Nutzer:innen, die den öffentlichen Link zum Board
+> kennen. Dies kann schnell zum Bottleneck werden und Debugging erschweren, daher sollten weitere Maßnahmen getroffen werden:
+> * Alias für die Nutzer:innen erfassen
+> * zusätzlicher Schutz des Links durch Passwort oder Ablaufdatum
+> * Anzahl paralleler Nutzer:innen begrenzen
+> * nur Lese-Zugriff erlauben
+
 ## Zugriffsrechte für ein Board entziehen
 
 Wenn Nutzer:innen die Zugriffsrechte entzogen werden, müssen alle künftigen Post-it-Inhalte auf eine andere Weise
