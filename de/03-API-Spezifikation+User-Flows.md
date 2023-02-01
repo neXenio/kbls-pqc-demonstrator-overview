@@ -143,7 +143,7 @@ encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 4. Board Key verschlüsseln
 
 ```python
-key_encryption_key = hkdf(secret1 || secret2)
+key_encryption_key  = hkdf(secret1 || secret2)
 encrypted_board_key = aes256kw.encrypt(board_key, key_encryption_key)
 ```
 
@@ -447,7 +447,7 @@ encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 4. Board Key verschlüsseln
 
 ```python
-key_encryption_key  = HKDF(secret1 || secret2)
+key_encryption_key  = hkdf(secret1 || secret2)
 encrypted_board_key = aes256kw.encrypt(board_key, key_encryption_key)
 ```
 
