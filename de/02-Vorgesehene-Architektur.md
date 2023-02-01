@@ -141,3 +141,28 @@ möglich ist.
 Entsprechend entscheiden wir uns im neXboard bei der Verschlüsselung von Post-it-Inhalten dazu, nicht den AEAD GCM zu nutzen,
 sondern verwenden stattdessen eine Encrypt-Then-HMAC-Konstruktion (CTR + HMAC). Für andere Anwendungsfälle, in denen die
 Eigenschaft des Key-Commitments nicht entscheidend ist, wird hingegen GCM eingesetzt.
+
+## Wiedererlangung der Sicherheit nach Verlust von Schlüsselmaterial
+
+Wenn Schlüsselmaterial (Passwort, private Schlüssel oder Board Key) kompromittiert wurde, so kann eine Quantencomputer-Netzwerkangreifer:in
+mittels des Netzwerkverkehrs die verschlüsselten Post-it-Inhalte abfangen und entschlüsseln, da TLS keine Post-Quanten-Sicherheit
+bietet. Hat die Angreifer:in bereits einen Austausch mit den verschlüsselten Inhalten abgefangen, so ist die Vertraulichkeit
+der Daten verloren. Hat sie noch keinen Austausch mit den Post-it-Inhalten abgehört, so kann sie diese mit dem nächsten
+Abrufen durch eine Nutzer:in abfangen und entschlüsseln.
+
+Wird vor diesem Aufruf bekannt, dass Schlüsselmaterial kompromittiert wurde (z.B. bei Verlust eines Passwort-Managers),
+so können je nach Schlüsselmaterial unterschiedliche Schritte unternommen werden, um die Vertraulichkeit und Integrität
+so weit wie möglich zu schützen.
+
+Sind private Schlüssel einer Nutzer:in betroffen, so müssen diese rotiert werden (siehe [Schlüsselpaare registrieren](03-API-Spezifikation%2BUser-Flows.md#schlüsselpaare-registrieren))
+und bisherige, für die Nutzer:in gespeicherte, verschlüsselte Board Keys gelöscht werden. Das gleiche gilt, wenn das Passwort
+betroffen ist, wobei in diesem Fall zusätzlich das Passwort rotiert werden muss. Weiter sollten Board Keys als kompromittiert
+angesehen werden, da sie bei Kompromittierung von Passwort oder privaten Schlüsseln über den nicht-postquantensicheren TLS-Datenverkehr
+exponiert werden.
+
+Ist ein Board Key betroffen, muss das Board komplett umgeschlüsselt werden (oder zumindest die zugehörigen Post-its).
+Dies kann allerdings nur nach Abrufen der Daten und damit nach dem potentiellen Kompromittieren der Daten geschehen. Es
+kann jedoch durch das Abrufen, Kopieren und Neu-Erstellen des Boards ein neues, nicht kompromittiertes Board erstellt werden.
+Wird dieser Schritt mit dem Löschen des alten Boards ergänzt, so hat eine Netzwerk-Angreifer:in nur eine einzige Chance,
+die Übertragung abzuhören. Dadurch stellt ein Boardwechsel eine bessere Alternative zum Akzeptieren der Kompromittierung
+der Post-it-Inhalte dar.
