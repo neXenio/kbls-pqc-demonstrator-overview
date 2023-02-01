@@ -110,7 +110,7 @@ der Server unverschlüsselt als Metadaten abspeichert. Um beim Prozess [Zugriffs
 nicht viele Daten umschlüsseln zu müssen, können mehrere Board Keys parallel existieren, von denen aber nur mittels des
 neusten Inhalte verändert oder hinzugefügt werden können.
 
-## Diskussion des Modus für die Verschlüsselung
+## Diskussion des Modus für die Verschlüsselung von Post-it-Inhalten
 
 Seit Jahren ist bekannt, dass für die Verschlüsselung nicht nur die Vertraulichkeit, sondern auch die Integrität durch den
 eingesetzten Chiffre gewährleistet werden muss, da ansonsten in der Praxis vorkommende Entschlüsselungsorakel genügen, um

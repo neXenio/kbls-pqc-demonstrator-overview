@@ -65,7 +65,7 @@ encrypted_private_key = aes256gcm.encrypt(private_key, encryption_key, iv)
 > * Die zum Einsatz kommenden kryptografischen Funktionen sind PBKDF2, AES-256 im Galois-Counter-Modus (AES-GCM) sowie SHA-256.
 > * Der Wert `salt` besteht aus 16 Bytes, die von einem geeigneten Zufallszahlengenerator erstellt wurden, und wird
 >   gemeinsam mit `encrypted_private_key` beim Server gespeichert.
-> * Der konstante String `"encryptPrivateKeys"` wird genutzt, um eine Domänenseparierung zugewährleisten, damit ein zum Beispiel
+> * Der konstante String `"encryptPrivateKeys"` wird genutzt, um eine Domänenseparierung zu gewährleisten, damit ein zum Beispiel
 >   beim Auth-Server gespeicherter PBKDF2-Passworthash nicht dem symmetrischen `encryption_key` entspricht. Dazu wird der
 >   String mit dem Salt konkateniert (`||`).
 > * Der Wert `sha256(public_key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
@@ -144,11 +144,8 @@ encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 
 ```python
 key_encryption_key = hkdf(secret1 || secret2)
-iv = sha256(board_id)
-encrypted_board_key = aes256gcm.encrypt(board_key, key_encryption_key, iv)
+encrypted_board_key = aes256kw.encrypt(board_key, key_encryption_key)
 ```
-
-> Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 5. IDs für die öffentlichen Schlüssel erstellen
 
@@ -303,14 +300,11 @@ kdf_input1     = Kyber.decapsulate(enc_kdf_input1, kyber_private_key, source_kyb
 kdf_input2     = RSA.decapsulate(enc_kdf_input2, rsa_private_key, source_rsa_public_key)
 
 encryption_key = hkdf(kdf_input1 || kdf_input2)
-iv             = sha256(board_id)
 
 enc_board_key = board_key_encryption_data.encryptedBoardKey
-board_key     = aes256gcm.decrypt(enc_board_key, encryption_key, iv)
+board_key     = aes256kw.decrypt(enc_board_key, encryption_key)
 board_key_id  = sha256(board_key)
 ```
-
-> Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 5. Abrufen aller Post-it-Inhalte beim Server mit anschließender MAC-Validierung und Entschlüsselung
 
@@ -365,11 +359,8 @@ encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 
 ```python
 key_encryption_key  = hkdf(secret1 || secret2)
-iv                  = sha256(board_id)
-encrypted_board_key = aes256gcm.encrypt(board_key, key_encryption_key, iv)
+encrypted_board_key = aes256kw.encrypt(board_key, key_encryption_key)
 ```
-
-> Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 5. IDs für die öffentlichen Schlüssel erstellen
 
@@ -457,11 +448,8 @@ encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 
 ```python
 key_encryption_key  = HKDF(secret1 || secret2)
-iv                  = sha256(board_id)
-encrypted_board_key = aes256gcm.encrypt(board_key, key_encryption_key, iv)
+encrypted_board_key = aes256kw.encrypt(board_key, key_encryption_key)
 ```
-
-> Der Wert `sha256(board_id)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 5. IDs für die öffentlichen Schlüssel erstellen
 
