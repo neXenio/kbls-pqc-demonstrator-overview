@@ -64,7 +64,7 @@ encrypted_private_key = aes256gcm.encrypt(private_key, encryption_key, iv)
 > Erklärungen:
 > * Die Berechnung passiert jeweils für Kyber und RSA mit den spezifischen Schlüsseln und Salts.
 > * Die zum Einsatz kommenden kryptografischen Funktionen sind PBKDF2, AES-256 im Galois-Counter-Modus (AES-GCM) sowie SHA-256.
-> * Der Wert `password` wird von der Nutzer:in bestimmt und wird separat vom Login behandelt.
+> * Der Wert `password` wird von der Nutzer:in bestimmt und ist unabhängig vom Nutzerpasswort, das beim Login verwendet wird.
 > * Der Wert `encryption_salt` besteht aus 16 Bytes, die von einem geeigneten Zufallszahlengenerator erstellt wurden, und wird
 >   gemeinsam mit `encrypted_private_key` beim Server gespeichert.
 > * Der konstante String `"encryptPrivateKeys"` wird genutzt, um eine Domänenseparierung zu gewährleisten, damit ein zum Beispiel
@@ -78,7 +78,9 @@ encrypted_private_key = aes256gcm.encrypt(private_key, encryption_key, iv)
 >   mindestens 100.000 interne Iterationen - lieber noch mehr). Darüber hinaus sollten Nutzer:innen dazu angehalten werden, 
 >   sichere Passwörter zu verwenden (keine Wiederverwendung, hohe Entropie). Nicht zuletzt ist ein wichtiger Schutzmechanismus
 >   an dieser Stelle das Vertrauen, dass der Server nicht bösartig handelt und vor Angriffen geschützt ist.
-> * Der Wert `encryption_salt` ist erforderlich, um einen sicheren Wechsel des Passworts zu gewährleisten.
+> * Der Wert `encryption_salt` ist erforderlich, um eine Vorberechnung der zu schwachen Passwörtern zugehörigen Schlüssel
+>   zu verhindern. Um einen sicheren Wechsel des Passworts zu gewährleisten, wird bei einem Passwortwechsel auch das Salt neu
+>   gewählt.
 > * Der Wert `encryption_salt` ist aus kryptografischer Sicht unpräzise benannt: Das Salt wird für PBKDF2 verwendet, nicht für 
 >   die Verschlüsselung. Das Verschlüsseln bedingt aber PBKDF2 und damit das Salt.
 
@@ -239,7 +241,9 @@ erforderlich und andererseits der verschlüsselte Board Key. Alice holt sich bei
 ```python
 user_id_alice               = "alice@acme.com"
 hybrid_key_pair             = request("GET", "/keys/{user_id_alice}")
+kyber_public_key            = hybrid_key_pair.keyPair1.publicKey.pkBase64
 encrypted_kyber_private_key = hybrid_key_pair.keyPair1.encryptedPrivateKey
+rsa_public_key              = hybrid_key_pair.keyPair2.publicKey.pkBase64
 encrypted_rsa_private_key   = hybrid_key_pair.keyPair2.encryptedPrivateKey
 ```
 
@@ -262,7 +266,7 @@ rsa_private_key       = aes256gcm.decrypt(rsa_ciphertext, rsa_encryption_key, rs
 ```
 
 > Erklärungen:
-> * Der Wert `password` muss von Alice korrekt angegeben werden.
+> * Der Wert `password` muss von Alice korrekt angegeben werden, wird aber nie an den Server übertragen.
 > * Die Werte `sha256(*_public_key)` werden auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 > * Der konstante String `"encryptPrivateKeys"` wird genutzt, um eine Domänenseparierung zu gewährleisten, damit ein zum Beispiel
 >   beim Auth-Server gespeicherter PBKDF2-Passworthash nicht dem symmetrischen `encryption_key` entspricht. Dazu wird der
@@ -500,12 +504,12 @@ TODO: image
 > ist aber aus Gesichtspunkten der Bedienbarkeit offensichtlich unerwünscht. Deshalb implementiert neXboard ein geeignetes
 > Locking-Verfahren, dass parallele Änderungen an der Menge der Nutzer:innen eines Boards verhindert oder geeignet auflöst.
 
-## Passwort Ändern oder Zurücksetzen
+## Passwort ändern oder zurücksetzen
 
 Das Ändern bzw. Zurücksetzen des Passworts bezieht sich hier auf das Passwort, welches die Nutzer:in bei der [Registrierung der Schlüsselpaare](#schlüsselpaare-registrieren)
 gewählt hat. 
 
-### Passwort Ändern
+### Passwort ändern
 
 Der Ablauf dafür, ein Passwort zu ändern, ist wie folgt:
 
@@ -513,14 +517,29 @@ Der Ablauf dafür, ein Passwort zu ändern, ist wie folgt:
    Schritte 1-2 beschrieben.
 ```python
 hybrid_key_pair             = request("GET", "/keys/{user_id}")
-# ...
+kyber_public_key            = hybrid_key_pair.keyPair1.publicKey.pkBase64
+encrypted_kyber_private_key = hybrid_key_pair.keyPair1.encryptedPrivateKey
+rsa_public_key              = hybrid_key_pair.keyPair2.publicKey.pkBase64
+encrypted_rsa_private_key   = hybrid_key_pair.keyPair2.encryptedPrivateKey
 
 # Kyber
-kyber_private_key = aes256gcm.decrypt(kyber_ciphertext, kyber_encryption_key, kyber_iv)
+kyber_encryption_salt       = encrypted_kyber_private_key.encryption_salt
+kyber_encryption_key        = pbkdf2(password, "encryptPrivateKeys" || kyber_encryption_salt)
+kyber_ciphertext            = encrypted_kyber_private_key.skCiphertext
+kyber_iv                    = sha256(kyber_public_key)
+kyber_private_key           = aes256gcm.decrypt(kyber_ciphertext, kyber_encryption_key, kyber_iv)
 
 # RSA
-rsa_private_key   = aes256gcm.decrypt(rsa_ciphertext, rsa_encryption_key, rsa_iv)
+rsa_encryption_salt         = encrypted_rsa_private_key.encryption_salt
+rsa_encryption_key          = pbkdf2(password, "encryptPrivateKeys" || rsa_encryption_salt)
+rsa_ciphertext              = encrypted_rsa_private_key.skCiphertext
+rsa_iv                      = sha256(rsa_public_key)
+rsa_private_key             = aes256gcm.decrypt(rsa_ciphertext, rsa_encryption_key, rsa_iv)
 ```
+> Erklärungen:
+> * Der Wert `password` muss von Alice korrekt angegeben werden, wird aber nie an den Server übertragen.
+> * Die Werte `sha256(*_public_key)` werden auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
+
 2. Private Schlüssel mit neuem Passwort verschlüsseln und an den Server schicken wie in [Schlüsselpaare registrieren](#schlüsselpaare-registrieren)
    Schritte 2-4 beschrieben. 
 
@@ -539,16 +558,15 @@ rsa_encrypted_private_key   = aes256gcm.encrypt(rsa_private_key, new_rsa_encrypt
 request("POST", "/keys", hybrid_key_pair)
 ```
 > Erklärungen:
-> * Der Wert `new_password` wird von der Nutzer:in bestimmt und wird separat vom Login behandelt.
 > * Die Werte `*_encryption_salt` müssen erneuert werden, um die Effektivität von Offline-Angriffen einzuschränken.
-> * Der Wert `sha256(public_key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
+> * Der Wert `new_password` wird von der Nutzer:in bestimmt und ist unabhängig vom Nutzerpasswort, das beim Login verwendet wird.
 
-### Passwort Zurücksetzen
+### Passwort zurücksetzen
 
 Ein Passwort zurückzusetzen ist technisch nicht möglich, weil die verschlüsselten privaten Schlüssel nur mit dem ursprünglichen
 Passwort wieder entschlüsselt werden können - und nur die betroffene Nutzer:in kennt bzw. kannte das ursprüngliche Passwort.
 
 Was allerdings eingeschränkt möglich ist, ist, auf bestehende Boards wieder Zugriff zu erhalten. Wenn ein Board mit einer anderen
-Nutzer:in geteilt wurde, kann ebendiese:r weitere Nutzer:innen einladen. Die betroffene Nutzer:in, die das Passwort zurücksetzen
+Nutzer:in geteilt wurde, kann ebendiese weitere Nutzer:innen einladen. Die betroffene Nutzer:in, die das Passwort zurücksetzen
 möchte, kann also [neue Schlüsselpaare registrieren](#schlüsselpaare-registrieren) und wieder eingeladen werden. Zugriff auf 
 Boards, die nicht geteilt wurden, kann nicht wiederhergestellt werden. 
