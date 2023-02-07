@@ -140,6 +140,9 @@ key_encryption_key  = hkdf(secret1 || secret2)
 encrypted_board_key = aes256kw.encrypt(board_key, key_encryption_key)
 ```
 
+> Erklärungen:
+> * Die zum Einsatz kommenden kryptografischen Funktionen sind HKDF und AES-256 im Key-Wrap-Modus (KW).
+
 5. IDs für die öffentlichen Schlüssel erstellen
 
 ```python
@@ -248,9 +251,9 @@ rsa_public_key              = hybrid_key_pair.keyPair2.publicKey.pkBase64
 encrypted_rsa_private_key   = hybrid_key_pair.keyPair2.encryptedPrivateKey
 ```
 
-> Anmerkung: die Angabe der E-Mail-Adresse in der URL ist hier nur beispielhaft, eine auf Sicherheit bedachte Implementierung
+> Anmerkung: Die Angabe der E-Mail-Adresse in der URL ist hier nur beispielhaft, eine auf Sicherheit bedachte Implementierung
 > sollte diese Information schützen. Dies ist beispielsweise möglich durch die Verwendung von UUIDs für `userId` oder indem
-> die E-Mail-Adresse im Request body übergeben wird.
+> die E-Mail-Adresse im Request Body übergeben wird.
 
 2. Entschlüsseln der privaten Schlüssel
 
@@ -416,7 +419,7 @@ damit zu den Inhalten des Boards. Wenn der öffentliche Link deaktiviert wird, e
 ["Zugriffsrechte für ein Board entziehen"](#zugriffsrechte-für-ein-board-entziehen), wobei hier dem Server die Zugriffsrechte 
 entzogen werden.
 
-> Anmerkung: der Server agiert bei diesem Ansatz als Proxy für alle Nutzer:innen, die den öffentlichen Link zum Board
+> Anmerkung: Der Server agiert bei diesem Ansatz als Proxy für alle Nutzer:innen, die den öffentlichen Link zum Board
 > kennen. Dies kann schnell zum Bottleneck werden und Debugging erschweren, daher sollten weitere Maßnahmen getroffen werden:
 > * Alias für die Nutzer:innen erfassen
 > * zusätzlicher Schutz des Links durch Passwort oder Ablaufdatum
@@ -473,23 +476,23 @@ id2 = sha256(rsa_public_key_user)
   "source": { "id1": "59ec81ac05fdc91...", "id2": "06fafdfcc94157d..." },
   "target": { "id1": "59ec81ac05fdc91...", "id2": "06fafdfcc94157d..." },
   "encryptedBoardKey": "5oM1/ifWoEtHFOFfAtEqBaxrtaUo4kbOyBugx+BXY5umydX2uzt5iw==",
-  "hybridEncryptionMode": "KYBER_768_RSA_4096",
-   "encapsulatedKdfInput1": "SCK275S3OHr1oTSeacxwg4SuBzHnnwNZ...",
-   "encapsulatedKdfInput2": "7c1XMG0qGjU3XT0eybIXH1oHlVIAdMsj..."
+  "hybridEncryptionMode": "KYBER_768_RSA_4096", 
+  "encapsulatedKdfInput1": "SCK275S3OHr1oTSeacxwg4SuBzHnnwNZ...",
+  "encapsulatedKdfInput2": "7c1XMG0qGjU3XT0eybIXH1oHlVIAdMsj..."
 }
 ```
 
 7. Board Encryption Data DTO an den Server schicken
 
 <!-- https://excalidraw.com/#json=ySe5gpwX7floIwkKN6dGo,B8KCa2-Ngtii24UEEC1uWw -->
-![Zugriffsrechte entziehen](../images/03-07-01-key-rotation.png)
+![Schlüsselrotation](../images/03-07-01-key-rotation.png)
 
 8. Schritte 2-7 für alle Nutzer:innen mit Zugriffsrechten wiederholen - exklusive aller Nutzer:innen, deren Zugriffsrechte
    entzogen wurden.
 9. Server informieren, dass der Board Key gewechselt wurde
 
 <!-- https://excalidraw.com/#json=ZMGQvkOaSupBLC5mCXSuU,l37K8on9DfLKWxlZ79Q8HQ -->
-![Zugriffsrechte entziehen](../images/03-07-02-key-rotation.png)
+![Abschluss Schlüsselrotation](../images/03-07-02-key-rotation.png)
 
 > Schritt 9 stellt sicher, dass der alte Board Key nicht weiterhin benutzt wird. Anschließend verhindert der Server das
 > Hinzufügen von Änderungen, die unter einem anderen Board Key verschlüsselt wurden.

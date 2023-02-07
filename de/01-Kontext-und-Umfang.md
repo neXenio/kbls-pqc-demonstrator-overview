@@ -9,20 +9,19 @@ Kryptobibliothek botan "um Quantencomputer-resistente Verfahren zu erweitern". D
 verarbeiteten Daten garantieren können". Darüber hinaus "wird die Leistungsfähigkeit und Benutzbarkeit der Bibliothek
 evaluiert".
 
-Um diese Ziele zu erreichen, soll im Arbeitspaket 13 ein prototypischer Demonstrator entwickelt werden. Der Demonstrator
-soll exemplarisch aufzeigen, wie die Ergebnisse aus den vorangegangenen Arbeitspaketen genutzt werden können.
-Insbesondere erhoffen wir uns wichtige Einsichten hinsichtlich
+Um diese Ziele zu erreichen, soll ein prototypischer Demonstrator entwickelt werden. Dieser Demonstrator soll exemplarisch
+aufzeigen, wie die Ergebnisse aus den vorangegangenen Arbeitspaketen genutzt werden können. Insbesondere erhoffen wir uns
+wichtige Einsichten hinsichtlich
 
 * der generellen Bedienbarkeit von botan
 * der spezifischen Verwendung von botan für Web Clients
 * der Performanz bei Anwendungen mit Echtzeit-Anforderung
 * der Realisierung von Krypto-Agilität
 
-Diesbezüglich sind die wichtigsten Ergebnisse aus den vorangegangenen Arbeitspaketen
+Diesbezüglich sind die wichtigsten Zwischenergebnisse des KBLS-Projekts:
 
-* Empfehlungen + Implementierung für eine agile Krypto-API (AP2 + AP7)
-* Spezifikation eines hybriden Schlüsseleinigungsverfahrens (AP5)
-* Implementierung von Kyber (AP8)
+* [Implementierung von Kyber](https://github.com/randombit/botan/pull/2872)
+* [Implementierung von Dilithium](https://github.com/randombit/botan/pull/2973)
 
 ## Use Case neXboard
 
@@ -65,13 +64,13 @@ dann ist das Schutzziel nicht erfüllt.
 
 ## Vereinfachende Annahmen
 
-* Server ist "honest-but-curious"[^1], das heißt er wird nicht aktiv versuchen die Kommunikation zu verändern, ihm wird aber
+* Server ist "honest-but-curious"[^1], das heißt er wird nicht aktiv versuchen, die Kommunikation zu verändern, ihm wird aber
 nicht bezüglich der Vertraulichkeit vertraut. Insbesondere auch:
   * Integrität der Client-Applikation: Der Server liefert das Frontend unverändert aus[^2] und verändert nicht die für die
-  Clients gespeicherten Daten
-  * Vollständigkeit: Dem Server wird vertraut, keine Post-its zu unterschlagen
-* Verfügbarkeit: der neXboard-Server ist hochverfügbar
-* Sicherheit kryptografischer Primitive: AES-256, SHA-256 und Kyber sind bis zu einem ausreichenden Sicherheitslevel quantenresistent
+  Clients gespeicherten Daten.
+  * Vollständigkeit: Dem Server wird vertraut, keine Post-its zu unterschlagen.
+* Verfügbarkeit: Der neXboard-Server ist hochverfügbar.
+* Sicherheit kryptografischer Primitive: AES-256, SHA-256 und Kyber sind bis zu einem ausreichenden Sicherheitslevel quantenresistent.
 
 ## Nicht-Ziele
 
@@ -80,23 +79,23 @@ bleiben. Die Alternative, diese Einschränkungen auszuschließen, ist nur mit an
 etwa die Wartbarkeit, Bedienbarkeit oder Performanz des Systems betreffen. Einzelne Nicht-Ziele können später in Ziele
 geändert werden, dies hat allerdings weitreichende Folgen und erfordert teils signifikante Anpassungen am Konzept.
 
-* Es werden keine besonderen Maßnahmen getroffen, um gegen einen aktiv angreifenden Applikationsserver zu verteidigen
+* Es werden keine besonderen Maßnahmen getroffen, um gegen einen aktiv angreifenden Applikationsserver zu verteidigen.
 * Die Vertraulichkeit und Integrität des gesamten Boards wird nicht sichergestellt, insb. betrifft dies die Metadaten von
-  Post-its (Position, Größe, Farbe, Verknüpfungen, Version)
-  * Der Server kann also bspw. Post-its verschieben oder alte Post-its anzeigen
-* Keine Authentizität oder Deniability: Die eindeutige Urheberschaft eines Post-its muss nicht sichergestellt werden
-  * Nutzer:innen haben also keine Möglichkeit zu bestimmen oder abzustreiten, wer ein bestimmtes Post-it verfasst hat
-  * Nutzer:innen haben außerdem keine Möglichkeit zu bestimmen oder abzustreiten, wer einen bestimmten Board Key ausgestellt
-    hat
-* Keine Backward Secrecy: eingeladene Nutzer:innen erhalten Einsicht auf alle bisher geteilten Daten
-* Begrenzte Forward Secrecy: wenn eine Angreifer:in Zugriff auf einen Board Key erhält, erhält sie damit Zugriff auf alle
+  Post-its (Position, Größe, Farbe, Verknüpfungen, Version).
+  * Der Server kann also bspw. Post-its verschieben oder alte Post-its anzeigen.
+* Keine Authentizität oder Deniability: Die eindeutige Urheberschaft eines Post-its muss nicht sichergestellt werden.
+  * Nutzer:innen haben also keine Möglichkeit, eindeutig zu bestimmen oder abzustreiten, wer ein bestimmtes Post-it verfasst hat.
+  * Nutzer:innen haben außerdem keine Möglichkeit, eindeutig zu bestimmen oder abzustreiten, wer einen bestimmten Board Key 
+    ausgestellt hat.
+* Keine Backward Secrecy: Eingeladene Nutzer:innen erhalten Einsicht auf alle bisher geteilten Daten.
+* Begrenzte Forward Secrecy: Wenn eine Angreifer:in Zugriff auf einen Board Key erhält, erhält sie damit Zugriff auf alle
   Post-it-Inhalte, die unter diesem Board Key verschlüsselt werden. Insbesondere werden ihr auch neue Post-it-Inhalte zugänglich,
   welche nach der Kompromittierung, aber vor dem Ausschluss anderer Nutzer:innen, erstellt werden.
 
 [^1]: Bezüglich allen Daten außer dem Passwort. Aufgrund des bisherigen Aufbaus von neXboard müssen sich Nutzer
 mit Nutzername und Passwort am Server anmelden. Im beschriebenen System nimmt das Passwort aber auch eine sicherheitskritische
 Rolle beim Zwischenspeicher von privaten Nutzerschlüsseln ein. Daher wird der neXboard-Server tatsächlich durch zwei Server
-implementiert: einen Auth-Server, der das Nutzerpasswort beim Login erhält, und den Applikationsserver, welcher das Nutzerpasswort
+implementiert - einen Auth-Server, der das Nutzerpasswort beim Login erhält, und den Applikationsserver, welcher das Nutzerpasswort
 nie erhält. Unter der Annahme eines ehrlichen Auth-Servers (Angriffsoberfläche ist geringer, da kein Nutzerinput außer UserID
 und Passwort verarbeitet wird und nur Login-Funktionalität umgesetzt werden muss) gilt für den Applikationsserver das erwähnte
 Angriffsmodell einer passiven (honest-but-curious) Angreifer:in. Damit wird ein stärkeres Angriffsmodell abgesichert als

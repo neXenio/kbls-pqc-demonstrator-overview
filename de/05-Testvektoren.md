@@ -192,6 +192,8 @@ HTwMtMu9FJxg9m7T+NioXb6vHMrJ+KeO
 
 ## Alice erstellt Schlüsselmaterial für ein Board
 
+Hierbei erstellt Alice Schlüsselmaterial für ein neues Board, das sie zunächst nur für sich selbst verschlüsselt.
+
 1. Alice generiert einen Board Key (32 zufällige Bytes):
 <details>
   <summary>Source Code</summary>
@@ -207,73 +209,73 @@ print('board_key:', base64.b64encode(board_key))
 board_key: pKua3nhSlRKnTjtOwbnz3D/wmqagNe6A1TC2NhGhOCs=
 ```
 
-2. Alice erstellt und verschlüsselt ein erstes Geheimnis mit Kyber:
+2. Alice erstellt und verschlüsselt mit Kyber ein erstes Geheimnis, das später als KDF-Input dient:
 <details>
   <summary>Source Code</summary>
 
 ```python
-kyber_kem_result     = Kyber.encapsulate(kyber_private_key, kyber_public_key)
-secret1              = kyber_kem_result.secret
-encapsulated_secret1 = kyber_kem_result.encapsulated_secret
+kyber_kem_result        = Kyber.encapsulate(kyber_private_key, kyber_public_key)
+kdf_input1              = kyber_kem_result.secret
+encapsulated_kdf_input1 = kyber_kem_result.encapsulated_secret
 
-print('secret1:             ', secret1)
-print('encapsulated_secret1:', encapsulated_secret1)
+print('kdf_input1:             ', kdf_input1)
+print('encapsulated_kdf_input1:', encapsulated_kdf_input1)
 ```
 </details>
 
 ```python
-secret1:              66dWmchrfIuHMqMDMzw1CpPsBj2SU+zlwfQRv5HSJus=
-encapsulated_secret1: MIIE4zCBlwYJKoZIhvcNAQMBMIGJAkEA/KaCzo4Syrom78z3EQ5SbbB4sF7ey80etKII864WF64B81uRpH5t9jQTxeEu0Imbz
-                      RMqzVDZkVG9xD7nN1kuFwJAZ4Rxsnqc9E7pGknFFH2xqaryRPBaQ01khpMdLRQnG541Awtx/XPaF5Bpsy4pNWMOHCBiNU0Nog
-                      psQW5QvnlMpAICBEADggRFAAKCBEDxohEP3AcCbSzZWNhCywBx29wFklldizylVeSxm1PxTfr8+RcJ0R1n38IEIT/smVugHbE
-                      NQOfbZ2E8i+re43GSSoEWs1N1Z9HNFh+UcmQedpsd8sDNjHObezQ3JUzFYcbkOFiZCrFyrgJ73+OkpiIRHAbH64+6Y83JYVB6
-                      ajfuP14OHYQcZjGJUklXwUaDTEeENVK8K26GPRdJ6E/17MOc3Sgq+CvgrpNRMxquuA0h8GgUXCe+K3APuvD37k2+tUQfIugr/
-                      JnkiwS0k0JLSyurqffEWX37zeKGpjvNZubcRzCPa59x+SHeINGGHkV6I0tquFIr5JznXLXguBbWJRdSM1u9Wv66q9YsGV25KD
-                      TyjCYmYYRFMagl0qg7+R8sQXNmj0MmfZ8oKGrOpkT8xPcAT2qHy7CFqfQkrN6AsOu2DSb7TOHrzy03LXzvgPg1ROBLZK4PbcG
-                      rvDOaq+pHdRxzpxQjxyUKZe0jy2L5J2ImEEJZ8zIV2msqqK/YwOyMDVGpF7GwLrs7oKb1uOrZ+y9eLKV8NLdHkfSgheujFqc/
-                      g67WvGjQGOZx0NPgDt+qe/2k13Qlpql5K4D8a/0uWrWBUCt1iUGdoYiHLxkz7EY2c/C05tmXYgSCV9/4YxRGXwfHesRRDqRwx
-                      opcFR0trb4PNxE/bCfq52MWcz1U2DFVEcHkZYKBpuVrwcuDwWNpJyq5/38yo/8kcBbTnO0rQBHAoXthS4b3eJr54OIix4IUgN
-                      xtiY1wRmbLZn3uDyvHaWVceitIcQFhh9GZRiMuoqQgCFpfaHPp41ULS+RFh13Si6luwEaxTyCskfkA56qjNmC569X2vsr4n0T
-                      MY9kQNPSMDfbX0t5bJztyL9Ts/DzoKFwb/2M1a2qBxFvIYDICuvT1z+kR9r5MEWIxbZW4U4UbFeDMSWm14kmBZIYuJ+1TTi0x
-                      3ev8+vwfFscvsx+A0WAbvRX5+jxPCVvoUIwRdbV47ORjxkeGeWmLjMaxVz3yPtYUvmJUH+HrNCDahtD07mYabyxtRa5un1L38
-                      nM4Jp0N0+jQ4CWFIdk28tADqcMo/p7lfkm2EC8wflWeJwC0sdsoEdR9o7D7aWdJL1kT2j2z6T4oqh9ddKTJLIXgvKQgSCMGic
-                      loKYHQbsOoJoBFQ/KhXKx8pZbYJOc/qf3iK6MfCkQuvYyca2z5Bk0P3HcfpGOAEwhdA0Yn/6rIhMR9Wnmx8FjPO64gD234ghu
-                      MU5PzftIUMdWMeSpdbkjwP4W+5JuZrhzTFdUpOzJVkVVjhQrQQF3Da8G2tpw28gimn7xm8I+wPkPFVn3/0Rnsr3rgA64Z6/pS
-                      lcXAXSkMVDN6+Ip3kE4InLQ0cN99HJmbUrO6Rjnf0pBDzWsLW9wgNtgewpAz7tmiRxftWmwpqeh0c88v+rRF+IbjALTUEHUyP
-                      wRsTYc5fOxUYN6z2J3FmqImWg==
+kdf_input1:              66dWmchrfIuHMqMDMzw1CpPsBj2SU+zlwfQRv5HSJus=
+encapsulated_kdf_input1: MIIE4zCBlwYJKoZIhvcNAQMBMIGJAkEA/KaCzo4Syrom78z3EQ5SbbB4sF7ey80etKII864WF64B81uRpH5t9jQTxeEu0I
+                         mbzRMqzVDZkVG9xD7nN1kuFwJAZ4Rxsnqc9E7pGknFFH2xqaryRPBaQ01khpMdLRQnG541Awtx/XPaF5Bpsy4pNWMOHCBi
+                         NU0NogpsQW5QvnlMpAICBEADggRFAAKCBEDxohEP3AcCbSzZWNhCywBx29wFklldizylVeSxm1PxTfr8+RcJ0R1n38IEIT
+                         /smVugHbENQOfbZ2E8i+re43GSSoEWs1N1Z9HNFh+UcmQedpsd8sDNjHObezQ3JUzFYcbkOFiZCrFyrgJ73+OkpiIRHAbH
+                         64+6Y83JYVB6ajfuP14OHYQcZjGJUklXwUaDTEeENVK8K26GPRdJ6E/17MOc3Sgq+CvgrpNRMxquuA0h8GgUXCe+K3APuv
+                         D37k2+tUQfIugr/JnkiwS0k0JLSyurqffEWX37zeKGpjvNZubcRzCPa59x+SHeINGGHkV6I0tquFIr5JznXLXguBbWJRdS
+                         M1u9Wv66q9YsGV25KDTyjCYmYYRFMagl0qg7+R8sQXNmj0MmfZ8oKGrOpkT8xPcAT2qHy7CFqfQkrN6AsOu2DSb7TOHrzy
+                         03LXzvgPg1ROBLZK4PbcGrvDOaq+pHdRxzpxQjxyUKZe0jy2L5J2ImEEJZ8zIV2msqqK/YwOyMDVGpF7GwLrs7oKb1uOrZ
+                         +y9eLKV8NLdHkfSgheujFqc/g67WvGjQGOZx0NPgDt+qe/2k13Qlpql5K4D8a/0uWrWBUCt1iUGdoYiHLxkz7EY2c/C05t
+                         mXYgSCV9/4YxRGXwfHesRRDqRwxopcFR0trb4PNxE/bCfq52MWcz1U2DFVEcHkZYKBpuVrwcuDwWNpJyq5/38yo/8kcBbT
+                         nO0rQBHAoXthS4b3eJr54OIix4IUgNxtiY1wRmbLZn3uDyvHaWVceitIcQFhh9GZRiMuoqQgCFpfaHPp41ULS+RFh13Si6
+                         luwEaxTyCskfkA56qjNmC569X2vsr4n0TMY9kQNPSMDfbX0t5bJztyL9Ts/DzoKFwb/2M1a2qBxFvIYDICuvT1z+kR9r5M
+                         EWIxbZW4U4UbFeDMSWm14kmBZIYuJ+1TTi0x3ev8+vwfFscvsx+A0WAbvRX5+jxPCVvoUIwRdbV47ORjxkeGeWmLjMaxVz
+                         3yPtYUvmJUH+HrNCDahtD07mYabyxtRa5un1L38nM4Jp0N0+jQ4CWFIdk28tADqcMo/p7lfkm2EC8wflWeJwC0sdsoEdR9
+                         o7D7aWdJL1kT2j2z6T4oqh9ddKTJLIXgvKQgSCMGicloKYHQbsOoJoBFQ/KhXKx8pZbYJOc/qf3iK6MfCkQuvYyca2z5Bk
+                         0P3HcfpGOAEwhdA0Yn/6rIhMR9Wnmx8FjPO64gD234ghuMU5PzftIUMdWMeSpdbkjwP4W+5JuZrhzTFdUpOzJVkVVjhQrQ
+                         QF3Da8G2tpw28gimn7xm8I+wPkPFVn3/0Rnsr3rgA64Z6/pSlcXAXSkMVDN6+Ip3kE4InLQ0cN99HJmbUrO6Rjnf0pBDzW
+                         sLW9wgNtgewpAz7tmiRxftWmwpqeh0c88v+rRF+IbjALTUEHUyPwRsTYc5fOxUYN6z2J3FmqImWg==
 ```
 
-3. Alice erstellt und verschlüsselt ein zweites Geheimnis mit RSA:
+3. Alice erstellt und verschlüsselt mit RSA ein zweites Geheimnis, das später als KDF-Input dient:
 <details>
   <summary>Source Code</summary>
 
 ```python
-rsa_kem_result       = RSA.encapsulate(rsa_private_key, rsa_public_key)
-secret2              = rsa_kem_result.secret
-encapsulated_secret2 = rsa_kem_result.encapsulated_secret
+rsa_kem_result          = RSA.encapsulate(rsa_private_key, rsa_public_key)
+kdf_input2              = rsa_kem_result.secret
+encapsulated_kdf_input2 = rsa_kem_result.encapsulated_secret
 
-print('secret2:             ', secret2)
-print('encapsulated_secret2:', encapsulated_secret2)
+print('kdf_input2:             ', kdf_input2)
+print('encapsulated_kdf_input2:', encapsulated_kdf_input2)
 ```
 </details>
 
 ```python
-secret2:              R5do1jbeqyptBbGafLz3eMs6QpdLQYnMhxEUhswqtvft1DAKFn0mYk0nXvO7/ltUxM9IjXGb0aJrU89I26dZfYOQ8drZiFgsp
-                      JMwpHjy6GMDMhLb2Yox4i3scrkCZS+ap8Zk2sTk1/VdERxZdbCKaVI+K0LAeI43lFkYeoMpir9MkNArSI/f2zNWW5BCqmXZcZ
-                      JUKcQWfvwGv1ovg0qs3ifN6bX10H8MvgELBudEq3DqGBgiH7arFZeT2/m1Fubq48tMS4tKLs1HzSOQP4OVhjkav6fqsKMFdKd
-                      +5wecKcgGDCvwBkLCKWR8T2Ie0sNs7XJ4xeTUFGcPwZFhmJ7og8Xb+HaiQ+DZWxUuBjqs7h+Pp85V/T6SIMkZpFBw1DCSQlIh
-                      fZDCaAK0wM2zDLWHWveM+xoe9KLQaxr2GHAD6N02uJ2UvwY+ZSlUvoulYC6sGQLtAmN7M1D5x0GqPIBr/03btjD4ECa7vz5+q
-                      g4CgMbS545oLVI+oYpw43KoGR1Qhjt0VfmBoJuf2YrI4hr85LdBUCmewcDmSz78Es+YLcIH7+YspXNAXwV2pmip2hf7YuKbXI
-                      q4nx9TC5BzgO1IgSMO6agigZt97xzcvJ8Nw1SbD45SSdCUnnE7V1ZywR/H7EKGKKi+60fvwGB7IK0Q9oTrXkyni33MQNweO27
-                      KYqs=
-encapsulated_secret2: Bu4B4ptBfjKLWWtMH1+WgENwclZNlz0uJs3TKgyxZop2HFo+wz+NBaNijwKixlLuF6H5YR22raAjjQR8qveGfRKHvsv8ldsEU
-                      g5cNdbJ413GZrAwGio5LID4z3sCRbKpAThQg1ho+qqiLpX08jfup0Rk2ib7MVJCi8Ax7U6ZjZtM3dBr0IIWWlSWarzyyP9e83
-                      PGguaqsTqUTc/lKenbcenuNNzhH/o3Aaw3/ywv7hsJQgWbrO/CwjIYJVNtk9s6Y0AfVLP6z9BMruSsO+zRRb93HOcFNvdYbga
-                      iYw/mqtbC1mSuzFsFJKrFwPzu8J+AGP28Axdxpe/wlDvYPio+mnoP3YmaEOE34BeEVRIHDDUHg5s92lajTqEs7+19ykLIdPMg
-                      A3me+p305bxWXX605UoXLr3C0YMGvdhcE0S4/cOjp0cLMM18uHxfln5eeKcNkiqZB4EltfDTsF6z/VTLYcSfyP0hkSYR1OJ9z
-                      FdjbBXwRQs3yDxLb/4msQtH6xeTmqwiO2jd0Wzh6hjilUU0/aDzpMa0ZE+mhtLCDUtvQa/qUYeFStEPfdm6eulNRSCWVbutr3
-                      +a3iG5bcI5DCQ21IeHRJtAqLRZhcY/zYpNvlEQDQ7IZ0x9aUTEmmLJ71kNO+2Yhkzfmrl9dDK8Nx0xcSqsZO6T4xSJormtfMZ
-                      njCc=
+kdf_input2:              R5do1jbeqyptBbGafLz3eMs6QpdLQYnMhxEUhswqtvft1DAKFn0mYk0nXvO7/ltUxM9IjXGb0aJrU89I26dZfYOQ8drZiF
+                         gspJMwpHjy6GMDMhLb2Yox4i3scrkCZS+ap8Zk2sTk1/VdERxZdbCKaVI+K0LAeI43lFkYeoMpir9MkNArSI/f2zNWW5BC
+                         qmXZcZJUKcQWfvwGv1ovg0qs3ifN6bX10H8MvgELBudEq3DqGBgiH7arFZeT2/m1Fubq48tMS4tKLs1HzSOQP4OVhjkav6
+                         fqsKMFdKd+5wecKcgGDCvwBkLCKWR8T2Ie0sNs7XJ4xeTUFGcPwZFhmJ7og8Xb+HaiQ+DZWxUuBjqs7h+Pp85V/T6SIMkZ
+                         pFBw1DCSQlIhfZDCaAK0wM2zDLWHWveM+xoe9KLQaxr2GHAD6N02uJ2UvwY+ZSlUvoulYC6sGQLtAmN7M1D5x0GqPIBr/0
+                         3btjD4ECa7vz5+qg4CgMbS545oLVI+oYpw43KoGR1Qhjt0VfmBoJuf2YrI4hr85LdBUCmewcDmSz78Es+YLcIH7+YspXNA
+                         XwV2pmip2hf7YuKbXIq4nx9TC5BzgO1IgSMO6agigZt97xzcvJ8Nw1SbD45SSdCUnnE7V1ZywR/H7EKGKKi+60fvwGB7IK
+                         0Q9oTrXkyni33MQNweO27KYqs=
+encapsulated_kdf_input2: Bu4B4ptBfjKLWWtMH1+WgENwclZNlz0uJs3TKgyxZop2HFo+wz+NBaNijwKixlLuF6H5YR22raAjjQR8qveGfRKHvsv8ld
+                         sEUg5cNdbJ413GZrAwGio5LID4z3sCRbKpAThQg1ho+qqiLpX08jfup0Rk2ib7MVJCi8Ax7U6ZjZtM3dBr0IIWWlSWarzy
+                         yP9e83PGguaqsTqUTc/lKenbcenuNNzhH/o3Aaw3/ywv7hsJQgWbrO/CwjIYJVNtk9s6Y0AfVLP6z9BMruSsO+zRRb93HO
+                         cFNvdYbgaiYw/mqtbC1mSuzFsFJKrFwPzu8J+AGP28Axdxpe/wlDvYPio+mnoP3YmaEOE34BeEVRIHDDUHg5s92lajTqEs
+                         7+19ykLIdPMgA3me+p305bxWXX605UoXLr3C0YMGvdhcE0S4/cOjp0cLMM18uHxfln5eeKcNkiqZB4EltfDTsF6z/VTLYc
+                         SfyP0hkSYR1OJ9zFdjbBXwRQs3yDxLb/4msQtH6xeTmqwiO2jd0Wzh6hjilUU0/aDzpMa0ZE+mhtLCDUtvQa/qUYeFStEP
+                         fdm6eulNRSCWVbutr3+a3iG5bcI5DCQ21IeHRJtAqLRZhcY/zYpNvlEQDQ7IZ0x9aUTEmmLJ71kNO+2Yhkzfmrl9dDK8Nx
+                         0xcSqsZO6T4xSJormtfMZnjCc=
 ```
 
 4. Alice verschlüsselt den Board Key
@@ -281,7 +283,7 @@ encapsulated_secret2: Bu4B4ptBfjKLWWtMH1+WgENwclZNlz0uJs3TKgyxZop2HFo+wz+NBaNijw
   <summary>Source Code</summary>
 
 ```python
-key_encryption_key  = hkdf(secret1 || secret2)
+key_encryption_key  = hkdf(kdf_input1 || kdf_input2)
 encrypted_board_key = aes256kw.encrypt(board_key, key_encryption_key)
 
 print('key_encryption_key: ', key_encryption_key)
@@ -295,6 +297,8 @@ encrypted_board_key: 5+v3LhNeFW7yGsJzaSJKAhRBnFkw2bB8nKKnK9rr3gaa3jMqfghb9Q==
 ```
 
 ## Alice öffnet ein Board, das sie zuvor erstellt hat
+
+Die Schritte, in denen Alice Daten vom Server bezieht, werden hier der Einfachheit halber ausgelassen.
 
 1. Alice hat das verschlüsselte Schlüsselmaterial bereits vorliegen
 
@@ -328,41 +332,41 @@ encapsulated_kdf_input2: Bu4B4ptBfjKLWWtMH1+WgENwclZNlz0uJs3TKgyxZop2HFo+wz+NBaN
                          0xcSqsZO6T4xSJormtfMZnjCc=
 ```
 
-2. Alice entschlüsselt das erste Geheimnis mit Kyber
+2. Alice entschlüsselt mit Kyber das erste Geheimnis, das später als KDF-Input dient: 
 
 <details>
   <summary>Source Code</summary>
 
 ```python
-secret1 = Kyber.decapsulate(encapsulated_kdf_input1, kyber_private_key, kyber_public_key)
+kdf_input1 = Kyber.decapsulate(encapsulated_kdf_input1, kyber_private_key, kyber_public_key)
 
-print('secret1:', secret1)
+print('kdf_input1:', kdf_input1)
 ```
 </details>
 
 ```python
-secret1: 66dWmchrfIuHMqMDMzw1CpPsBj2SU+zlwfQRv5HSJus=
+kdf_input1: 66dWmchrfIuHMqMDMzw1CpPsBj2SU+zlwfQRv5HSJus=
 ```
-3. Alice entschlüsselt das zweite Geheimnis mit RSA
+3. Alice entschlüsselt mit RSA das zweite Geheimnis, das später als KDF-Input dient:
 
 <details>
   <summary>Source Code</summary>
 
 ```python
-secret2 = RSA.decapsulate(encapsulated_kdf_input2, rsa_private_key, rsa_public_key)
+kdf_input2 = RSA.decapsulate(encapsulated_kdf_input2, rsa_private_key, rsa_public_key)
 
-print('secret2:', secret2)
+print('kdf_input2:', kdf_input2)
 ```
 </details>
 
 ```python
-secret2: R5do1jbeqyptBbGafLz3eMs6QpdLQYnMhxEUhswqtvft1DAKFn0mYk0nXvO7/ltUxM9IjXGb0aJrU89I26dZfYOQ8drZiFgspJMwpHjy6GMDMh
-         Lb2Yox4i3scrkCZS+ap8Zk2sTk1/VdERxZdbCKaVI+K0LAeI43lFkYeoMpir9MkNArSI/f2zNWW5BCqmXZcZJUKcQWfvwGv1ovg0qs3ifN6bX1
-         0H8MvgELBudEq3DqGBgiH7arFZeT2/m1Fubq48tMS4tKLs1HzSOQP4OVhjkav6fqsKMFdKd+5wecKcgGDCvwBkLCKWR8T2Ie0sNs7XJ4xeTUFG
-         cPwZFhmJ7og8Xb+HaiQ+DZWxUuBjqs7h+Pp85V/T6SIMkZpFBw1DCSQlIhfZDCaAK0wM2zDLWHWveM+xoe9KLQaxr2GHAD6N02uJ2UvwY+ZSlU
-         voulYC6sGQLtAmN7M1D5x0GqPIBr/03btjD4ECa7vz5+qg4CgMbS545oLVI+oYpw43KoGR1Qhjt0VfmBoJuf2YrI4hr85LdBUCmewcDmSz78Es
-         +YLcIH7+YspXNAXwV2pmip2hf7YuKbXIq4nx9TC5BzgO1IgSMO6agigZt97xzcvJ8Nw1SbD45SSdCUnnE7V1ZywR/H7EKGKKi+60fvwGB7IK0Q
-         9oTrXkyni33MQNweO27KYqs=
+kdf_input2: R5do1jbeqyptBbGafLz3eMs6QpdLQYnMhxEUhswqtvft1DAKFn0mYk0nXvO7/ltUxM9IjXGb0aJrU89I26dZfYOQ8drZiFgspJMwpHjy6GM
+            DMhLb2Yox4i3scrkCZS+ap8Zk2sTk1/VdERxZdbCKaVI+K0LAeI43lFkYeoMpir9MkNArSI/f2zNWW5BCqmXZcZJUKcQWfvwGv1ovg0qs3i
+            fN6bX10H8MvgELBudEq3DqGBgiH7arFZeT2/m1Fubq48tMS4tKLs1HzSOQP4OVhjkav6fqsKMFdKd+5wecKcgGDCvwBkLCKWR8T2Ie0sNs7
+            XJ4xeTUFGcPwZFhmJ7og8Xb+HaiQ+DZWxUuBjqs7h+Pp85V/T6SIMkZpFBw1DCSQlIhfZDCaAK0wM2zDLWHWveM+xoe9KLQaxr2GHAD6N02
+            uJ2UvwY+ZSlUvoulYC6sGQLtAmN7M1D5x0GqPIBr/03btjD4ECa7vz5+qg4CgMbS545oLVI+oYpw43KoGR1Qhjt0VfmBoJuf2YrI4hr85Ld
+            BUCmewcDmSz78Es+YLcIH7+YspXNAXwV2pmip2hf7YuKbXIq4nx9TC5BzgO1IgSMO6agigZt97xzcvJ8Nw1SbD45SSdCUnnE7V1ZywR/H7E
+            KGKKi+60fvwGB7IK0Q9oTrXkyni33MQNweO27KYqs=
 ```
 4. Alice entschlüsselt den Board Key:
 
@@ -370,7 +374,7 @@ secret2: R5do1jbeqyptBbGafLz3eMs6QpdLQYnMhxEUhswqtvft1DAKFn0mYk0nXvO7/ltUxM9IjXG
   <summary>Source Code</summary>
 
 ```python
-encryption_key = hkdf(secret1 || secret2)
+encryption_key = hkdf(kdf_input1 || kdf_input2)
 board_key      = aes256kw.decrypt(encrypted_board_key, encryption_key)
 
 print('encryption_key:', encryption_key)
