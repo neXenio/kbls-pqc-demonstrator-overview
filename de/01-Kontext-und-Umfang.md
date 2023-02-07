@@ -98,7 +98,7 @@ mit Nutzername und Passwort am Server anmelden. Im beschriebenen System nimmt da
 Rolle beim Zwischenspeicher von privaten Nutzerschlüsseln ein. Daher wird der neXboard-Server tatsächlich durch zwei Server
 implementiert: einen Auth-Server, der das Nutzerpasswort beim Login erhält, und den Applikationsserver, welcher das Nutzerpasswort
 nie erhält. Unter der Annahme eines ehrlichen Auth-Servers (Angriffsoberfläche ist geringer, da kein Nutzerinput außer UserID
-und Passwort verarbeitet wird und nur Login-Funktionalität umgesetzt werden muss), gilt für den Applikationsserver das erwähnte
+und Passwort verarbeitet wird und nur Login-Funktionalität umgesetzt werden muss) gilt für den Applikationsserver das erwähnte
 Angriffsmodell einer passiven (honest-but-curious) Angreifer:in. Damit wird ein stärkeres Angriffsmodell abgesichert als
 im Normalfall des nicht hybriden neXboards, in welchem beide Komponenten des Servers als ehrlich betrachtet werden müssen.
 

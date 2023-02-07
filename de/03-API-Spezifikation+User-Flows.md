@@ -34,7 +34,7 @@ Schlüssel aufseiten aller Kommunikationspartner:innen. Eine einseitige Willense
 kann dadurch jedoch abgegeben und von einzelnen, kryptografisch kompatiblen Kommunikationspartner:innen honoriert werden.
 
 Der genaue Prozess, wie diese Rotation im Falle einer signifikanten Verschlechterung des Schutzniveaus (etwa im Fall eines
-neuen mathematischen Durchbruchs) schnell praktisch umgesetzt werden kann, ist nicht Teil dieses Konzepts. Auf die selbe
+neuen mathematischen Durchbruchs) schnell praktisch umgesetzt werden kann, ist nicht Teil dieses Konzepts. Auf dieselbe
 Weise können technisch auch beide Schlüsselpaare gleichzeitig abgelöst werden.
 
 1. Generiere Schlüsselpaare und Salts für die Schlüsselableitung
@@ -61,9 +61,11 @@ iv                    = sha256(public_key)
 encrypted_private_key = aes256gcm.encrypt(private_key, encryption_key, iv)
 ```
 
+> Erklärungen:
 > * Die Berechnung passiert jeweils für Kyber und RSA mit den spezifischen Schlüsseln und Salts.
 > * Die zum Einsatz kommenden kryptografischen Funktionen sind PBKDF2, AES-256 im Galois-Counter-Modus (AES-GCM) sowie SHA-256.
-> * Der Wert `salt` besteht aus 16 Bytes, die von einem geeigneten Zufallszahlengenerator erstellt wurden, und wird
+> * Der Wert `password` wird von der Nutzer:in bestimmt und ist unabhängig vom Nutzerpasswort, das beim Login verwendet wird.
+> * Der Wert `encryption_salt` besteht aus 16 Bytes, die von einem geeigneten Zufallszahlengenerator erstellt wurden, und wird
 >   gemeinsam mit `encrypted_private_key` beim Server gespeichert.
 > * Der konstante String `"encryptPrivateKeys"` wird genutzt, um eine Domänenseparierung zu gewährleisten, damit ein zum Beispiel
 >   beim Auth-Server gespeicherter PBKDF2-Passworthash nicht dem symmetrischen `encryption_key` entspricht. Dazu wird der
@@ -71,11 +73,16 @@ encrypted_private_key = aes256gcm.encrypt(private_key, encryption_key, iv)
 > * Der Wert `sha256(public_key)` wird auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
 
 > Bemerkungen:
-> * Dieser Ansatz erlaubt einen Offline-Angriff auf das `user_password` durch den Server oder jemanden, der den Server 
+> * Dieser Ansatz erlaubt einen Offline-Angriff auf das `password` durch den Server oder jemanden, der den Server 
 >   kompromittiert. PBKDF2 sollte so konfiguriert werden, dass solche Angriffe besonders ineffizient werden (bspw. durch 
 >   mindestens 100.000 interne Iterationen - lieber noch mehr). Darüber hinaus sollten Nutzer:innen dazu angehalten werden, 
 >   sichere Passwörter zu verwenden (keine Wiederverwendung, hohe Entropie). Nicht zuletzt ist ein wichtiger Schutzmechanismus
 >   an dieser Stelle das Vertrauen, dass der Server nicht bösartig handelt und vor Angriffen geschützt ist.
+> * Der Wert `encryption_salt` ist erforderlich, um eine Vorberechnung der zu schwachen Passwörtern zugehörigen Schlüssel
+>   zu verhindern. Um einen sicheren Wechsel des Passworts zu gewährleisten, wird bei einem Passwortwechsel auch das Salt neu
+>   gewählt.
+> * Der Wert `encryption_salt` ist aus kryptografischer Sicht unpräzise benannt: Das Salt wird für PBKDF2 verwendet, nicht für 
+>   die Verschlüsselung. Das Verschlüsseln bedingt aber PBKDF2 und damit das Salt.
 
 3. Ergebnis als DTO encodieren (beispielhaft für Kyber)
 
@@ -96,20 +103,6 @@ encrypted_private_key = aes256gcm.encrypt(private_key, encryption_key, iv)
 4. Key Pair DTOs mit User ID aggregieren und an den Server schicken
 
 ![Registrierung der Schlüsselpaare](../images/03-02-key-pair-registration.png)
-
-> Das `encryption_salt` für die Verschlüsselung des `private_key`s ist aus kryptografischer Sicht an dieser Stelle
-> redundant und unpräzise benannt:
->
-> * Die resultierenden `encryption_key`s werden jeweils nur einmal verwendet. Deshalb kann der IV hier ohne Sicherheitsbedenken
->   statisch je Schlüsselpaar sein und das Salt für PBKDF2 aus dem `public_key` abgeleitet werden (bspw.
->   `sha256(public_key)`). Somit ist ein separates `encryption_salt` technisch nicht erforderlich.
-> * Das Salt wird für PBKDF2 verwendet, nicht für die Verschlüsselung. Das Verschlüsseln bedingt aber PBKDF2 und damit das
->   Salt.
-> * Damit ein Passworthash mit PBKDF2, der in einem anderen Kontext genutzt wird, nicht zufällig dem `encryption_key` entspricht,
->   wird der konstante String `"encryptPrivateKeys"` dem Salt vorangestellt.
->
-> Wir verwenden an dieser Stelle trotzdem ein separates Salt, um einerseits versehentlichen Fehlern an anderer Stelle
-> vorzubeugen und andererseits weitere Verschlüsselungsmodi ohne API-Anpassungen zu ermöglichen.
 
 ## Board erstellen
 
@@ -248,27 +241,36 @@ erforderlich und andererseits der verschlüsselte Board Key. Alice holt sich bei
 ```python
 user_id_alice               = "alice@acme.com"
 hybrid_key_pair             = request("GET", "/keys/{user_id_alice}")
+kyber_public_key            = hybrid_key_pair.keyPair1.publicKey.pkBase64
 encrypted_kyber_private_key = hybrid_key_pair.keyPair1.encryptedPrivateKey
+rsa_public_key              = hybrid_key_pair.keyPair2.publicKey.pkBase64
 encrypted_rsa_private_key   = hybrid_key_pair.keyPair2.encryptedPrivateKey
 ```
 
 2. Entschlüsseln der privaten Schlüssel
 
 ```python
+# Kyber
 kyber_encryption_salt = encrypted_kyber_private_key.encryption_salt
-kyber_encryption_key  = pbkdf2(password, kyber_encryption_salt)
+kyber_encryption_key  = pbkdf2(password, "encryptPrivateKeys" || kyber_encryption_salt)
 kyber_ciphertext      = encrypted_kyber_private_key.skCiphertext
 kyber_iv              = sha256(kyber_public_key)
 kyber_private_key     = aes256gcm.decrypt(kyber_ciphertext, kyber_encryption_key, kyber_iv)
 
-rsa_encryption_salt = encrypted_rsa_private_key.encryption_salt
-rsa_encryption_key  = pbkdf2(password, rsa_encryption_salt)
-rsa_ciphertext      = encrypted_rsa_private_key.skCiphertext
-rsa_iv              = sha256(rsa_public_key)
-rsa_private_key     = aes256gcm.decrypt(rsa_ciphertext, rsa_encryption_key, rsa_iv)
+# RSA
+rsa_encryption_salt   = encrypted_rsa_private_key.encryption_salt
+rsa_encryption_key    = pbkdf2(password, "encryptPrivateKeys" || rsa_encryption_salt)
+rsa_ciphertext        = encrypted_rsa_private_key.skCiphertext
+rsa_iv                = sha256(rsa_public_key)
+rsa_private_key       = aes256gcm.decrypt(rsa_ciphertext, rsa_encryption_key, rsa_iv)
 ```
 
-> Die Werte `sha256(*_public_key)` werden auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
+> Erklärungen:
+> * Der Wert `password` muss von Alice korrekt angegeben werden, wird aber nie an den Server übertragen.
+> * Die Werte `sha256(*_public_key)` werden auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
+> * Der konstante String `"encryptPrivateKeys"` wird genutzt, um eine Domänenseparierung zu gewährleisten, damit ein zum Beispiel
+>   beim Auth-Server gespeicherter PBKDF2-Passworthash nicht dem symmetrischen `encryption_key` entspricht. Dazu wird der
+>   String mit dem Salt konkateniert (`||`).
 
 3. Abrufen aller für Alice verschlüsselten Board Keys beim Server, weitere Schritte exemplarisch für den ersten Board Key
 
@@ -501,3 +503,70 @@ TODO: image
 > erstellten neuen Board Key erhält. Der Zustand wäre nicht sicherheitskritisch, da er weniger Zugriff als erwartet verteilt,
 > ist aber aus Gesichtspunkten der Bedienbarkeit offensichtlich unerwünscht. Deshalb implementiert neXboard ein geeignetes
 > Locking-Verfahren, dass parallele Änderungen an der Menge der Nutzer:innen eines Boards verhindert oder geeignet auflöst.
+
+## Passwort ändern oder zurücksetzen
+
+Das Ändern bzw. Zurücksetzen des Passworts bezieht sich hier auf das Passwort, welches die Nutzer:in bei der [Registrierung der Schlüsselpaare](#schlüsselpaare-registrieren)
+gewählt hat. 
+
+### Passwort ändern
+
+Der Ablauf dafür, ein Passwort zu ändern, ist wie folgt:
+
+1. Abrufen der hybriden Schlüsselpaare beim Server mit anschließendem Entschlüsseln der privaten Schlüssel wie in [Board öffnen](#board-öffnen)
+   Schritte 1-2 beschrieben.
+```python
+hybrid_key_pair             = request("GET", "/keys/{user_id}")
+kyber_public_key            = hybrid_key_pair.keyPair1.publicKey.pkBase64
+encrypted_kyber_private_key = hybrid_key_pair.keyPair1.encryptedPrivateKey
+rsa_public_key              = hybrid_key_pair.keyPair2.publicKey.pkBase64
+encrypted_rsa_private_key   = hybrid_key_pair.keyPair2.encryptedPrivateKey
+
+# Kyber
+kyber_encryption_salt       = encrypted_kyber_private_key.encryption_salt
+kyber_encryption_key        = pbkdf2(password, "encryptPrivateKeys" || kyber_encryption_salt)
+kyber_ciphertext            = encrypted_kyber_private_key.skCiphertext
+kyber_iv                    = sha256(kyber_public_key)
+kyber_private_key           = aes256gcm.decrypt(kyber_ciphertext, kyber_encryption_key, kyber_iv)
+
+# RSA
+rsa_encryption_salt         = encrypted_rsa_private_key.encryption_salt
+rsa_encryption_key          = pbkdf2(password, "encryptPrivateKeys" || rsa_encryption_salt)
+rsa_ciphertext              = encrypted_rsa_private_key.skCiphertext
+rsa_iv                      = sha256(rsa_public_key)
+rsa_private_key             = aes256gcm.decrypt(rsa_ciphertext, rsa_encryption_key, rsa_iv)
+```
+> Erklärungen:
+> * Der Wert `password` muss von Alice korrekt angegeben werden, wird aber nie an den Server übertragen.
+> * Die Werte `sha256(*_public_key)` werden auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
+
+2. Private Schlüssel mit neuem Passwort verschlüsseln und an den Server schicken wie in [Schlüsselpaare registrieren](#schlüsselpaare-registrieren)
+   Schritte 2-4 beschrieben. 
+
+```python
+# Kyber
+new_kyber_encryption_salt   = random_bytes(16)
+new_kyber_encryption_key    = pbkdf2(new_password, "encryptPrivateKeys" || new_kyber_encryption_salt)
+kyber_encrypted_private_key = aes256gcm.encrypt(kyber_private_key, new_kyber_encryption_key, kyber_iv)
+
+# RSA
+new_rsa_encryption_salt     = random_bytes(16)
+new_rsa_encryption_key      = pbkdf2(new_password, "encryptPrivateKeys" || new_rsa_encryption_salt)
+rsa_encrypted_private_key   = aes256gcm.encrypt(rsa_private_key, new_rsa_encryption_key, rsa_iv)
+
+#...
+request("POST", "/keys", hybrid_key_pair)
+```
+> Erklärungen:
+> * Die Werte `*_encryption_salt` müssen erneuert werden, um die Effektivität von Offline-Angriffen einzuschränken.
+> * Der Wert `new_password` wird von der Nutzer:in bestimmt und ist unabhängig vom Nutzerpasswort, das beim Login verwendet wird.
+
+### Passwort zurücksetzen
+
+Ein Passwort zurückzusetzen ist technisch nicht möglich, weil die verschlüsselten privaten Schlüssel nur mit dem ursprünglichen
+Passwort wieder entschlüsselt werden können - und nur die betroffene Nutzer:in kennt bzw. kannte das ursprüngliche Passwort.
+
+Was allerdings eingeschränkt möglich ist, ist, auf bestehende Boards wieder Zugriff zu erhalten. Wenn ein Board mit einer anderen
+Nutzer:in geteilt wurde, kann ebendiese weitere Nutzer:innen einladen. Die betroffene Nutzer:in, die das Passwort zurücksetzen
+möchte, kann also [neue Schlüsselpaare registrieren](#schlüsselpaare-registrieren) und wieder eingeladen werden. Zugriff auf 
+Boards, die nicht geteilt wurden, kann nicht wiederhergestellt werden. 

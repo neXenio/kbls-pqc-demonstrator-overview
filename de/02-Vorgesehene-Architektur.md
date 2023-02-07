@@ -6,8 +6,13 @@ Wir verwenden ein einfaches Client-Server-Modell, wobei der Server lediglich zum
 Informationen dient. Die Businesslogik erfolgt überwiegend clientseitig, Ver- und Entschlüsselung erfolgt ausschließlich
 clientseitig. Es gibt beliebig viele Clients und einen Server, über den sich die Clients austauschen.
 
-Weitere Mechanismen wie Authentifizierung und Autorisierung, Caching, Pagination und Hochverfügbarkeit können ergänzt
-werden, um Zugriffsrechte feingranular zu definieren und die Performanz zu verbessern.
+Der Server bei neXboard setzt sich zusammen aus einem Auth-Server, welcher die Logik für Identitäts- und Zugriffsmanagement
+(IAM) kapselt, und einem Applikationsserver, welcher insbesondere das Schlüsselmaterial (öffentliche Schlüssel, verschlüsselte
+private Schlüssel und verschlüsselte Board Keys) und die verschlüsselten Post-it-Inhalte verwaltet. Im Folgenden hat sich
+die Nutzer:in bereits beim Auth-Server identifiziert, "Server" bezieht sich fortan auf den Applikationsserver.
+
+Weitere Mechanismen wie Autorisierung, Caching, Pagination und Hochverfügbarkeit können ergänzt werden, um Zugriffsrechte
+feingranular zu definieren und die Performanz zu verbessern.
 
 ## Hybrides Schlüsseleinigungsverfahren
 
@@ -69,7 +74,7 @@ Der Ablauf für das vorgesehene hybride Schlüsseleinigungsverfahren ist wie fol
 
 Die untenstehende Grafik veranschaulicht diesen Prozess:
 
-![Aufblauf der hybriden Schlüsseleinigung](../images/02-hybrid-encryption.png)
+![Ablauf der hybriden Schlüsseleinigung](../images/02-hybrid-encryption.png)
 
 Quellen
 
