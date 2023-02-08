@@ -4,7 +4,8 @@
 
 Wir verwenden ein einfaches Client-Server-Modell, wobei der Server lediglich zum Speichern und Abrufen aller notwendigen
 Informationen dient. Die Businesslogik erfolgt überwiegend clientseitig, Ver- und Entschlüsselung erfolgt ausschließlich
-clientseitig. Es gibt beliebig viele Clients und einen Server, über den sich die Clients austauschen.
+clientseitig. Es gibt beliebig viele Clients und einen Server, über den sich die Clients austauschen. Die Kommunikation
+zwischen Clients und Server geschieht über eine gesicherte TLS-Verbindung.
 
 Der Server bei neXboard setzt sich zusammen aus einem Auth-Server, welcher die Logik für Identitäts- und Zugriffsmanagement
 (IAM) kapselt, und einem Applikationsserver, welcher insbesondere das Schlüsselmaterial (öffentliche Schlüssel, verschlüsselte
@@ -38,11 +39,11 @@ Verfahren nicht derart gestaltet, dass die klassischen Verfahren direkt ausgetau
 Daraus ergibt sich die Notwendigkeit, ein gänzlich neues Schlüsseleinigungsverfahren zu verwenden. Die Idee eines
 hybriden Schlüsseleinigungsverfahrens erfüllt mehrere Zwecke:
 
-* die Möglichkeit ein Verfahren tatsächlich direkt auszutauschen
+* die Möglichkeit, ein Verfahren modular auszutauschen
 * die beste Sicherheit von zwei Verfahren über einen längeren Zeitraum zu erhalten
 
 Dies bewerkstelligt zum einen, dass die unbekannt lange Übergangsphase von klassischen zu quantenresistenten Verfahren
-abgesichert ist: während das RSA-Kryptosystem über die Zeit mit dem Herannahen von Quantencomputern an Sicherheit verliert,
+abgesichert ist: Während das RSA-Kryptosystem über die Zeit mit dem Herannahen von Quantencomputern an Sicherheit verliert,
 gewinnt die kryptografische Gemeinschaft Vertrauen in die Sicherheit von Kyber. Das liegt daran, dass die Sicherheit von
 Verfahren darauf basiert, dass keine Möglichkeit bekannt ist, sie zu brechen. Je länger daran geforscht wird, die Sicherheit
 eines Verfahrens zu brechen, ohne dass signifikante Angriffe bekannt werden, desto sicherer können wir in der Annahme gehen,
@@ -80,7 +81,6 @@ Quellen
 
 * <https://neilmadden.blog/2021/02/16/when-a-kem-is-not-enough/>
 * Kapitel 3.1 der Ausgabe "Kryptografie quantensicher gestalten" des BSI (15.12.2021)
-* Java-Implementierung: <https://github.com/neXenio/kbls-pqc-demonstrator-client>
 
 ## Schutz des Schlüsselmaterials
 

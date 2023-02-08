@@ -25,7 +25,7 @@ den [untengenannten Überlegungen](#performanz-effiziente-einladung) in Bezug au
 
 Das derzeitige Konzept sieht vor den KEK für die Verschlüsselung der privaten Schlüssel aus dem Passwort mittels PBKDF2
 zu berechnen. Diese Ableitung sollte (da Passwort-basiert) "lange" dauern. Nun werden aber nicht beide privaten Schlüssel
-mit dem selben KEK verschlüsselt, sondern separate KEKs mit unterschiedlichen Salts generiert. Das bedeutet, dass die teure
+mit demselben KEK verschlüsselt, sondern separate KEKs mit unterschiedlichen Salts generiert. Das bedeutet, dass die teure
 KDF mehrfach berechnet wird.
 
 Eine performantere Konstruktion, die sowohl unterschiedliche Schlüssel, eine Härtung durch zufälliges Salt und lange Ableitzeit
