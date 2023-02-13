@@ -136,12 +136,17 @@ encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 4. Board Key verschlüsseln
 
 ```python
-key_encryption_key  = hkdf(secret1 || secret2)
+key_encryption_key  = hkdf(secret1 || secret2, "aes-key")
 encrypted_board_key = aes256kw.encrypt(board_key, key_encryption_key)
 ```
 
 > Erklärungen:
 > * Die zum Einsatz kommenden kryptografischen Funktionen sind HKDF und AES-256 im Key-Wrap-Modus (KW).
+> * Die zu `secret1` und `secret2` korrespondierenden byte-Arrays werden konkateniert (`||`).
+
+> Anmerkungen:
+> * HKDF erhält als Parameter `salt` ein leeres byte-Array, weil die Inputs nur hier verwendet werden. Als Parameter `info`
+>   erhält HKDF den Wert `"aes-key"` zur Domänenseparierung.
 
 5. IDs für die öffentlichen Schlüssel erstellen
 
@@ -192,6 +197,9 @@ encrypted_postit_content = aes256ctr.encrypt(postit_content, encryption_key, iv)
 encryption_mac           = hmac(encrypted_postit_content, authentication_key)
 board_key_id             = sha256(board_key)
 ```
+
+> Anmerkungen:
+> * `"ENC"` und `"AUTH"` sind die Werte für den HKDF-Parameter `info`.
 
 2. Ergebnis als DTO encodieren
 
@@ -309,7 +317,7 @@ enc_kdf_input2 = board_key_encryption_data.encapsulatedKdfInput2
 kdf_input1     = Kyber.decapsulate(enc_kdf_input1, kyber_private_key, source_kyber_public_key)
 kdf_input2     = RSA.decapsulate(enc_kdf_input2, rsa_private_key, source_rsa_public_key)
 
-encryption_key = hkdf(kdf_input1 || kdf_input2)
+encryption_key = hkdf(kdf_input1 || kdf_input2, "aes-key")
 
 enc_board_key = board_key_encryption_data.encryptedBoardKey
 board_key     = aes256kw.decrypt(enc_board_key, encryption_key)
@@ -368,7 +376,7 @@ encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 4. Board Key verschlüsseln
 
 ```python
-key_encryption_key  = hkdf(secret1 || secret2)
+key_encryption_key  = hkdf(secret1 || secret2, "aes-key")
 encrypted_board_key = aes256kw.encrypt(board_key, key_encryption_key)
 ```
 
@@ -457,7 +465,7 @@ encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 4. Board Key verschlüsseln
 
 ```python
-key_encryption_key  = hkdf(secret1 || secret2)
+key_encryption_key  = hkdf(secret1 || secret2, "aes-key")
 encrypted_board_key = aes256kw.encrypt(board_key, key_encryption_key)
 ```
 
