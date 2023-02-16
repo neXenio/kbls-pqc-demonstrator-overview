@@ -54,9 +54,29 @@ können alle jemals existierenden Board Keys eines Boards gleichzeitig noch im E
 Da jeder Board Key mit einem neuen hybriden KEM-Aufruf einhergeht, kann bei einer Vielzahl an Board Keys die Dauer, die
 das Hinzufügen der neuen Nutzer:in benötigt, theoretisch beträchtlich sein.
 
-Um Einladungen effizienter durchzuführen, sind folgende Ansätze denkbar:
+Um Einladungen effizienter durchzuführen, sind folgende Ansätze denkbar (auch kombiniert):
 
 1. Bei einer Board Key Rotation werden alle bisherigen Post-it-Inhalte auf den neuen Board Key umgeschlüsselt; alte Board
 Keys werden anschließend gelöscht. Dies hat zur Folge, dass das Ausladen von Nutzer:innen mehr Aufwand mit sich bringt,
 dafür muss für neu eingeladene Nutzer:innen nur ein Board Key verschlüsselt werden.
 2. Wird eine neue Nutzer:in eingeladen, wird der gleiche KEK verwendet, um die verschiedenen Board Keys zu verschlüsseln.
+
+## Performanz: Scheduling für Ausladungen
+
+Der Aufwand für das Entfernen eingeladener Nutzer:innen ist proportional zur Anzahl der Board Keys multipliziert mit der
+Anzahl eingeladener Nutzer:innen. Während dieses Vorgangs muss zudem sichergestellt werden, dass keine anderen Aktivitäten
+einen inkonsistenten Zustand hervorrufen wie z.B. das Hinzufügen neuer Post-it-Inhalte verschlüsselt unter einem alten
+Board Key, das Hinzufügen weiterer Nutzer:innen oder das Entfernen weiter Nutzer:innen.
+
+Um Ausladungen effizienter durchzuführen, sind folgende Ansätze denkbar (auch kombiniert):
+
+1. Die für die vollständige Ausladung notwendigen Informationen (neuer Board Key verschlüsselt für alle Nutzer) werden
+   an den Server geschickt, aber nicht sofort durchgesetzt. Der Server wählt einen geeigneten oder konfigurierten Zeitpunkt
+   (bspw. 18 Uhr), um die Anpassungen vollständig umzusetzen. Eine anschließende Einladung oder Ausladung weiterer Nutzer:innen
+   muss dies berücksichtigen.
+2. Es wird das Konzept eines "maintenance users" ergänzt, welcher zum Board eingeladen wird. Dieser hat Zugriff auf Schlüsselmaterial,
+   insbesondere alle öffentlichen Schlüssel und die Board Keys. Der maintenance user führt die Board Key Rotation zu einem
+   geeigneten oder konfigurierten Zeitpunkt aus und berücksichtigt alle Ausladungen (Einladungen funktionieren wie gehabt).
+
+Dies hat zur Folge, dass die ausgeladenen Nutzer:innen für einen bestimmten bzw. konfigurierbaren Zeitraum weiterhin
+Zugriff auf neue Post-it-Inhalte haben.
