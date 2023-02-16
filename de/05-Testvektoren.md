@@ -347,6 +347,7 @@ print('kdf_input1:', kdf_input1)
 ```python
 kdf_input1: 66dWmchrfIuHMqMDMzw1CpPsBj2SU+zlwfQRv5HSJus=
 ```
+
 3. Alice entschlüsselt mit RSA das zweite Geheimnis, das später als KDF-Input dient:
 
 <details>
@@ -368,6 +369,7 @@ kdf_input2: R5do1jbeqyptBbGafLz3eMs6QpdLQYnMhxEUhswqtvft1DAKFn0mYk0nXvO7/ltUxM9I
             BUCmewcDmSz78Es+YLcIH7+YspXNAXwV2pmip2hf7YuKbXIq4nx9TC5BzgO1IgSMO6agigZt97xzcvJ8Nw1SbD45SSdCUnnE7V1ZywR/H7E
             KGKKi+60fvwGB7IK0Q9oTrXkyni33MQNweO27KYqs=
 ```
+
 4. Alice entschlüsselt den Board Key:
 
 <details>
