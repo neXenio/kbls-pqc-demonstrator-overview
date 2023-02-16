@@ -70,7 +70,7 @@ Board Key, das Hinzufügen weiterer Nutzer:innen oder das Entfernen weiter Nutze
 
 Um Ausladungen effizienter durchzuführen, sind folgende Ansätze denkbar (auch kombiniert):
 
-1. Die für die vollständige Ausladung notwendigen Informationen (neuer Board Key verschlüsselt für alle Nutzer) werden
+1. Die für die vollständige Ausladung notwendigen Informationen (neuer Board Key verschlüsselt für alle eingeladenen Nutzer) werden
    an den Server geschickt, aber nicht sofort durchgesetzt. Der Server wählt einen geeigneten oder konfigurierten Zeitpunkt
    (bspw. 18 Uhr), um die Anpassungen vollständig umzusetzen. Eine anschließende Einladung oder Ausladung weiterer Nutzer:innen
    muss dies berücksichtigen.

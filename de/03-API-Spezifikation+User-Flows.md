@@ -1,8 +1,7 @@
 # API Spezifikation + User Flows
 
-Die aktuelle API-Spezifikation ist unter folgender Quelle zu finden:
-<https://github.com/neXenio/kbls-pqc-demonstrator-api>.
-Die folgenden User Flows beschreiben, wie die API verwendet wird.
+Die folgenden User Flows beschreiben, wie die Clients mit dem Server interagieren. Hierfür werden beispielhafte Endpunkte
+und DTOs verwendet.
 
 > Im Folgenden wird für hybride Schlüsselpaare der Einfachheit halber angenommen, dass sie aus einem
 > Kyber-Schlüsselpaar und einem RSA-Schlüsselpaar bestehen.
@@ -12,7 +11,7 @@ Die folgenden User Flows beschreiben, wie die API verwendet wird.
 > Elliptic-Curve-Variante). Technisch lässt sich auch RSA mit EC kombinieren, aber dies hat keinen praktischen Nutzen in
 > Bezug auf die Quantencomputerresistenz.
 
-## Registrierung
+## Nutzer registrieren
 
 Am bestehenden Prozess der Nutzerregistrierung ändert sich nichts. Für die beschriebenen Funktionalitäten müssen aber
 für alle Nutzer:innen je zwei Schlüsselpaare registriert werden. Die Verknüpfung erfolgt über die User ID, die bei der
@@ -37,7 +36,7 @@ Der genaue Prozess, wie diese Rotation im Falle einer signifikanten Verschlechte
 neuen mathematischen Durchbruchs) schnell praktisch umgesetzt werden kann, ist nicht Teil dieses Konzepts. Auf dieselbe
 Weise können technisch auch beide Schlüsselpaare gleichzeitig abgelöst werden.
 
-1. Generiere Schlüsselpaare und Salts für die Schlüsselableitung
+1. Schlüsselpaare und Salts für die Schlüsselableitung generieren.
 
 ```python
 # Kyber
@@ -53,7 +52,7 @@ rsa_private_key_base64   = rsa_keypair.private # e.g. MIIJRAIBADANBgkqhkiG9w0BAQ
 rsa_encryption_salt      = random_bytes(16) # e.g. asdDRgVf5orcs5BTCyodea==
 ```
 
-2. Symmetrische Schlüssel für die Verschlüsselung privater Schlüssel aus dem Nutzerpasswort und Salt ableiten
+2. Symmetrische Schlüssel für die Verschlüsselung privater Schlüssel aus dem Nutzerpasswort und Salt ableiten.
 
 ```python
 encryption_key        = pbkdf2(password, "encryptPrivateKeys" || encryption_salt)
@@ -62,7 +61,7 @@ encrypted_private_key = aes256gcm.encrypt(private_key, encryption_key, iv)
 ```
 
 > Erklärungen:
-> * Die Berechnung passiert jeweils für Kyber und RSA mit den spezifischen Schlüsseln und Salts.
+> * Die Berechnung erfolgt jeweils für Kyber und RSA mit den spezifischen Schlüsseln und Salts.
 > * Die zum Einsatz kommenden kryptografischen Funktionen sind PBKDF2, AES-256 im Galois-Counter-Modus (AES-GCM) sowie SHA-256.
 > * Der Wert `password` wird von der Nutzer:in bestimmt und ist unabhängig vom Nutzerpasswort, das beim Login verwendet wird.
 > * Der Wert `encryption_salt` besteht aus 16 Bytes, die von einem geeigneten Zufallszahlengenerator erstellt wurden, und wird
@@ -84,7 +83,7 @@ encrypted_private_key = aes256gcm.encrypt(private_key, encryption_key, iv)
 > * Der Wert `encryption_salt` ist aus kryptografischer Sicht unpräzise benannt: Das Salt wird für PBKDF2 verwendet, nicht für 
 >   die Verschlüsselung. Das Verschlüsseln bedingt aber PBKDF2 und damit das Salt.
 
-3. Ergebnis als DTO encodieren (beispielhaft für Kyber)
+3. Ergebnis als DTO encodieren (beispielhaft für Kyber).
 
 ```json
 {
@@ -110,14 +109,14 @@ Die Erstellung eines Boards erfordert die Erstellung eines Board Keys und dessen
 dieses Board erstellt, teilt das Board gewissermaßen mit sich selbst. Im oben beschriebenen hybriden
 Schlüsseleinigungsverfahren nimmt diese Person die Rollen von Alice und Bob ein.
 
-1. Board ID (UUID Version 4) und Board Key generieren (32 zufällige Bytes)
+1. Board ID (UUID Version 4) und Board Key generieren (32 zufällige Bytes).
 
 ```python
 board_id  = UUID.random()
 board_key = random_bytes(32)
 ```
 
-2. Erstes Geheimnis mit Kyber erstellen und verschlüsseln
+2. Erstes Geheimnis mit Kyber erstellen und verschlüsseln.
 
 ```python
 kyber_kem_result     = Kyber.encapsulate(kyber_private_key_user, kyber_public_key_user)
@@ -125,7 +124,7 @@ secret1              = kyber_kem_result.secret
 encapsulated_secret1 = kyber_kem_result.encapsulated_secret
 ```
 
-3. Zweites Geheimnis mit RSA erstellen und verschlüsseln
+3. Zweites Geheimnis mit RSA erstellen und verschlüsseln.
 
 ```python
 rsa_kem_result       = RSA.encapsulate(rsa_private_key_user, rsa_public_key_user)
@@ -133,7 +132,7 @@ secret2              = rsa_kem_result.secret
 encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 ```
 
-4. Board Key verschlüsseln
+4. Board Key verschlüsseln.
 
 ```python
 key_encryption_key  = hkdf(secret1 || secret2, "aes-key")
@@ -148,14 +147,14 @@ encrypted_board_key = aes256kw.encrypt(board_key, key_encryption_key)
 > * HKDF erhält als Parameter `salt` ein leeres byte-Array, weil die Inputs nur hier verwendet werden. Als Parameter `info`
 >   erhält HKDF den Wert `"aes-key"` zur Domänenseparierung.
 
-5. IDs für die öffentlichen Schlüssel erstellen
+5. IDs für die öffentlichen Schlüssel erstellen.
 
 ```python
 id1 = sha256(kyber_public_key_user)
 id2 = sha256(rsa_public_key_user)
 ```
 
-6. Ergebnis als DTO encodieren
+6. Ergebnis als DTO encodieren.
 
 ```json
 {
@@ -185,7 +184,7 @@ verschlüsselt wurde.
 
 Änderungen können in Batches an den Server geschickt werden.
 
-1. Post-it-Inhalt
+1. Post-it-Inhalt:
 
 ```python
 # given: board_key, postit_id, postit_content
@@ -201,7 +200,7 @@ board_key_id             = sha256(board_key)
 > Anmerkungen:
 > * `"ENC"` und `"AUTH"` sind die Werte für den HKDF-Parameter `info`.
 
-2. Ergebnis als DTO encodieren
+2. Ergebnis als DTO encodieren.
 
 ```json
 {
@@ -220,7 +219,7 @@ board_key_id             = sha256(board_key)
 > des Hash-Werts ist, dass dieser einen [natürlicher Schlüssel](https://en.wikipedia.org/wiki/Natural_key) darstellt. 
 > Im Gegensatz dazu stellt die UUID einen [künstlichen Schlüssel](https://en.wikipedia.org/wiki/Surrogate_key) dar.
 
-3. Änderungen aggregieren und an den Server schicken
+3. Änderungen aggregieren und an den Server schicken.
 <!-- https://excalidraw.com/#json=2Pcid6KT0qRRxur-rGujX,cw6Gc_DXPH9AWOQqwk2G2w -->
 ![Bearbeitung eines Boards](../images/03-04-edit-board.png)
 
@@ -245,7 +244,7 @@ und lediglich ihre Zugangsdaten kennt.
 Um das Board zu öffnen, muss zuerst der Board Key entschlüsselt werden. Dazu sind einerseits die privaten Nutzerschlüssel
 erforderlich und andererseits der verschlüsselte Board Key. Alice holt sich beides vom Server:
 
-1. Abrufen der hybriden Schlüsselpaare beim Server
+1. Hybriden Schlüsselpaare beim Server abrufen.
 
 <!-- https://excalidraw.com/#json=CQsHUH2fqRvj5dkWqDrfb,XwEv0EoCLbBJSYJUYGpoAw -->
 ![Abrufen der hybriden Schlüsselpaare](../images/03-05-01-get-keys.png)
@@ -263,7 +262,7 @@ encrypted_rsa_private_key   = hybrid_key_pair.keyPair2.encryptedPrivateKey
 > sollte diese Information schützen. Dies ist beispielsweise möglich durch die Verwendung von UUIDs für `userId` oder indem
 > die E-Mail-Adresse im Request Body übergeben wird.
 
-2. Entschlüsseln der privaten Schlüssel
+2. Private Schlüssel entschlüsseln.
 
 ```python
 # Kyber
@@ -288,7 +287,7 @@ rsa_private_key       = aes256gcm.decrypt(rsa_ciphertext, rsa_encryption_key, rs
 >   beim Auth-Server gespeicherter PBKDF2-Passworthash nicht dem symmetrischen `encryption_key` entspricht. Dazu wird der
 >   String mit dem Salt konkateniert (`||`).
 
-3. Abrufen aller für Alice verschlüsselten Board Keys beim Server, weitere Schritte exemplarisch für den ersten Board Key
+3. Alle für Alice verschlüsselten Board Keys beim Server abrufen, weitere Schritte exemplarisch für den ersten Board Key.
 
 <!-- https://excalidraw.com/#json=9y47_3FI5hAhwlSmuZwky,3RQOgtO9kyJQNXRsj2BAHg -->
 ![Abrufen eines Boards](../images/03-05-03-get-boards.png)
@@ -309,7 +308,7 @@ source_kyber_public_key  = source_hybrid_public_key.pk1
 source_rsa_public_key    = source_hybrid_public_key.pk2
 ```
 
-4. Entschlüsseln des Board Keys
+4. Board Key entschlüsseln.
 
 ```python
 enc_kdf_input1 = board_key_encryption_data.encapsulatedKdfInput1
@@ -324,7 +323,7 @@ board_key     = aes256kw.decrypt(enc_board_key, encryption_key)
 board_key_id  = sha256(board_key)
 ```
 
-5. Abrufen aller Post-it-Inhalte beim Server mit anschließender MAC-Validierung und Entschlüsselung
+5. Alle Post-it-Inhalte beim Server abrufen mit anschließender MAC-Validierung und Entschlüsselung.
 
 <!-- https://excalidraw.com/#json=HLgMPuJHEfTYKnTRgMp7O,FTQWYGJQEEAlQm2ycF1hVA -->
 ![Abrufen aller Post-it-Inhalte](../images/03-05-05-get-events.png)
@@ -356,8 +355,9 @@ zu erstellen. Die einladende Nutzerin heißt im folgenden Alice, der eingeladene
 
 Der Prozess für Bob, das Board anschließend zu öffnen, ist der gleiche wie für Alice bereits oben beschrieben ist.
 
-1. Alice kennt die Board ID und den Board Key
-2. Erstes Geheimnis mit Kyber erstellen und verschlüsseln
+1. Alice kennt die Board ID und den Board Key.
+
+2. Erstes Geheimnis mit Kyber erstellen und verschlüsseln.
 
 ```python
 kyber_kem_result     = Kyber.encapsulate(kyber_private_key_alice, kyber_public_key_bob)
@@ -365,7 +365,7 @@ secret1              = kyber_kem_result.secret
 encapsulated_secret1 = kyber_kem_result.encapsulated_secret
 ```
 
-3. Zweites Geheimnis mit RSA erstellen
+3. Zweites Geheimnis mit RSA erstellen und verschlüsseln.
 
 ```python
 rsa_kem_result       = RSA.encapsulate(rsa_private_key_alice, rsa_public_key_bob)
@@ -373,14 +373,14 @@ secret2              = rsa_kem_result.secret
 encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 ```
 
-4. Board Key verschlüsseln
+4. Board Key verschlüsseln.
 
 ```python
 key_encryption_key  = hkdf(secret1 || secret2, "aes-key")
 encrypted_board_key = aes256kw.encrypt(board_key, key_encryption_key)
 ```
 
-5. IDs für die öffentlichen Schlüssel erstellen
+5. IDs für die öffentlichen Schlüssel erstellen.
 
 ```python
 id1_source = sha256(kyber_public_key_alice)
@@ -389,7 +389,7 @@ id1_target = sha256(kyber_public_key_bob)
 id2_target = sha256(rsa_public_key_bob)
 ```
 
-6. Ergebnis als DTO encodieren
+6. Ergebnis als DTO encodieren.
 
 ```json
 {
@@ -403,7 +403,7 @@ id2_target = sha256(rsa_public_key_bob)
 }
 ```
 
-7. Board Encryption Data DTO an den Server schicken
+7. Board Encryption Data DTO an den Server schicken.
 
 <!-- https://excalidraw.com/#json=sZIO9HkI5-zdr6OW1Xb7C,Kf9d-e9PDS80VbS2aWX03g -->
 ![Board mit anderen Nutzer:innen teilen](../images/03-06-share-board.png)
@@ -421,10 +421,10 @@ implementiert werden. Sie sollte daher sparsam eingesetzt werden.
 Beim öffentlichen Teilen eines Boards entfällt der Anspruch an seine Vertraulichkeit und Integrität, da nun Lese- und 
 Schreib-Zugriff aufs Board beliebig verteilt werden können. Insbesondere kann auch der Server solchen Zugriff erhalten.
 Um ein Board öffentlich zu teilen, wird es daher zunächst mit dem Server geteilt, welcher hierfür eigenes Board-spezifisches 
-Schlüsselmaterial generiert (siehe dazu den Workflow ["Schlüsselpaare registrieren"](#schlüsselpaare-registrieren)). 
+Schlüsselmaterial generiert (siehe dazu den Workflow [Schlüsselpaare registrieren](#schlüsselpaare-registrieren)). 
 Nutzer:innen mit Zugang zum öffentlichen Link erhalten Zugriff zum Board-spezifischen Schlüsselmaterial des Servers und 
 damit zu den Inhalten des Boards. Wenn der öffentliche Link deaktiviert wird, entspricht dies dem Workflow für 
-["Zugriffsrechte für ein Board entziehen"](#zugriffsrechte-für-ein-board-entziehen), wobei hier dem Server die Zugriffsrechte 
+[Zugriffsrechte für ein Board entziehen](#zugriffsrechte-für-ein-board-entziehen), wobei hier dem Server die Zugriffsrechte 
 entzogen werden.
 
 > Anmerkung: Der Server agiert bei diesem Ansatz als Proxy für alle Nutzer:innen, die den öffentlichen Link zum Board
@@ -440,13 +440,13 @@ Wenn Nutzer:innen die Zugriffsrechte entzogen werden, müssen alle künftigen Po
 verschlüsselt werden, um das Schutzziel weiterhin zu erfüllen. Dazu wird ein neuer Board Key erstellt und verteilt.
 Dieser Prozess funktioniert weitestgehend wie die Prozesse für das Erstellen und Teilen des Boards.
 
-1. Neuen Board Key generieren (32 zufällige Bytes)
+1. Neuen Board Key generieren (32 zufällige Bytes).
 
 ```python
 new_board_key = random_bytes(32)
 ```
 
-2. Erstes Geheimnis mit Kyber erstellen
+2. Erstes Geheimnis mit Kyber erstellen.
 
 ```python
 kyber_kem_result     = Kyber.encapsulate(kyber_private_key_user, kyber_public_key_user)
@@ -454,7 +454,7 @@ secret1              = kyber_kem_result.secret
 encapsulated_secret1 = kyber_kem_result.encapsulated_secret
 ```
 
-3. Zweites Geheimnis mit RSA erstellen
+3. Zweites Geheimnis mit RSA erstellen.
 
 ```python
 rsa_kem_result       = RSA.encapsulate(rsa_private_key_user, rsa_public_key_user)
@@ -462,21 +462,21 @@ secret2              = rsa_kem_result.secret
 encapsulated_secret2 = rsa_kem_result.encapsulated_secret
 ```
 
-4. Board Key verschlüsseln
+4. Board Key verschlüsseln.
 
 ```python
 key_encryption_key  = hkdf(secret1 || secret2, "aes-key")
 encrypted_board_key = aes256kw.encrypt(board_key, key_encryption_key)
 ```
 
-5. IDs für die öffentlichen Schlüssel erstellen
+5. IDs für die öffentlichen Schlüssel erstellen.
 
 ```python
 id1 = sha256(kyber_public_key_user)
 id2 = sha256(rsa_public_key_user)
 ```
 
-6. Ergebnis als DTO encodieren
+6. Ergebnis als DTO encodieren.
 
 ```json
 {
@@ -490,14 +490,14 @@ id2 = sha256(rsa_public_key_user)
 }
 ```
 
-7. Board Encryption Data DTO an den Server schicken
+7. Board Encryption Data DTO an den Server schicken.
 
 <!-- https://excalidraw.com/#json=ySe5gpwX7floIwkKN6dGo,B8KCa2-Ngtii24UEEC1uWw -->
 ![Schlüsselrotation](../images/03-07-01-key-rotation.png)
 
 8. Schritte 2-7 für alle Nutzer:innen mit Zugriffsrechten wiederholen - exklusive aller Nutzer:innen, deren Zugriffsrechte
    entzogen wurden.
-9. Server informieren, dass der Board Key gewechselt wurde
+9. Server informieren, dass der Board Key gewechselt wurde.
 
 <!-- https://excalidraw.com/#json=ZMGQvkOaSupBLC5mCXSuU,l37K8on9DfLKWxlZ79Q8HQ -->
 ![Abschluss Schlüsselrotation](../images/03-07-02-key-rotation.png)
@@ -529,6 +529,7 @@ Der Ablauf dafür, ein Passwort zu ändern, ist wie folgt:
 
 1. Abrufen der hybriden Schlüsselpaare beim Server mit anschließendem Entschlüsseln der privaten Schlüssel wie in [Board öffnen](#board-öffnen)
    Schritte 1-2 beschrieben.
+
 ```python
 hybrid_key_pair             = request("GET", "/keys/{user_id}")
 kyber_public_key            = hybrid_key_pair.keyPair1.publicKey.pkBase64
@@ -550,6 +551,7 @@ rsa_ciphertext              = encrypted_rsa_private_key.skCiphertext
 rsa_iv                      = sha256(rsa_public_key)
 rsa_private_key             = aes256gcm.decrypt(rsa_ciphertext, rsa_encryption_key, rsa_iv)
 ```
+
 > Erklärungen:
 > * Der Wert `password` muss von Alice korrekt angegeben werden, wird aber nie an den Server übertragen.
 > * Die Werte `sha256(*_public_key)` werden auf 12 Bytes gestutzt, um der empfohlenen Größe für AES-GCM zu entsprechen.
@@ -571,6 +573,7 @@ rsa_encrypted_private_key   = aes256gcm.encrypt(rsa_private_key, new_rsa_encrypt
 #...
 request("POST", "/keys", hybrid_key_pair)
 ```
+
 > Erklärungen:
 > * Die Werte `*_encryption_salt` müssen erneuert werden, um die Effektivität von Offline-Angriffen einzuschränken.
 > * Der Wert `new_password` wird von der Nutzer:in bestimmt und ist unabhängig vom Nutzerpasswort, das beim Login verwendet wird.

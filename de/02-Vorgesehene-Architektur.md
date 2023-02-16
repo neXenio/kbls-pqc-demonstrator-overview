@@ -160,13 +160,13 @@ so können je nach Schlüsselmaterial unterschiedliche Schritte unternommen werd
 so weit wie möglich zu schützen.
 
 Sind private Schlüssel einer Nutzer:in betroffen, so müssen diese rotiert werden (siehe [Schlüsselpaare registrieren](03-API-Spezifikation%2BUser-Flows.md#schlüsselpaare-registrieren))
-und bisherige, für die Nutzer:in gespeicherte, verschlüsselte Board Keys gelöscht werden. Das gleiche gilt, wenn das Passwort
+und bisherige, für die Nutzer:in gespeicherte, verschlüsselte Board Keys gelöscht werden. Das Gleiche gilt, wenn das Passwort
 betroffen ist, wobei in diesem Fall zusätzlich das Passwort rotiert werden muss. Weiter sollten Board Keys als kompromittiert
-angesehen werden, da sie bei Kompromittierung von Passwort oder privaten Schlüsseln über den nicht-postquantensicheren TLS-Datenverkehr
+angesehen werden, da sie bei Kompromittierung von Passwort oder privaten Schlüsseln über den nicht quantensicheren TLS-Datenverkehr
 exponiert werden.
 
 Ist ein Board Key betroffen, muss das Board komplett umgeschlüsselt werden (oder zumindest die zugehörigen Post-its).
-Dies kann allerdings nur nach Abrufen der Daten und damit nach dem potentiellen Kompromittieren der Daten geschehen. Es
+Dies kann allerdings nur nach Abrufen der Daten und damit nach dem potenziellen Kompromittieren der Daten geschehen. Es
 kann jedoch durch das Abrufen, Kopieren und Neu-Erstellen des Boards ein neues, nicht kompromittiertes Board erstellt werden.
 Wird dieser Schritt mit dem Löschen des alten Boards ergänzt, so hat eine Netzwerk-Angreifer:in nur eine einzige Chance,
 die Übertragung abzuhören. Dadurch stellt ein Boardwechsel eine bessere Alternative zum Akzeptieren der Kompromittierung
