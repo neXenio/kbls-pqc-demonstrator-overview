@@ -69,8 +69,8 @@ but this has far-reaching consequences and may require significant changes to th
 
 * No special measures are taken to defend against an actively attacking application server.
 * Confidentiality and integrity of the entire board is not ensured, only the confidentiality of all individual post-it
-  contents. In particular, this concerns the metadata of post-its (position, size, color, links, version). So the server
-  can, for example, move post-its or display old post-its.
+  contents. In particular, the metadata of post-its (position, size, color, links, version) are not specially protected.
+  So the server can, for example, move post-its or display old post-its.
 * No authenticity or deniability: The unique authorship of a post-it does not have to be ensured.
   * Users have no way to clearly determine or deny who wrote a particular post-it.
   * Users also have no way to clearly determine or deny who issued a particular Board Key.
