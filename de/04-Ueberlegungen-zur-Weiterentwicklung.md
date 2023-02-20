@@ -70,12 +70,12 @@ Board Key, das Hinzufügen weiterer Nutzer:innen oder das Entfernen weiter Nutze
 
 Um Ausladungen effizienter durchzuführen, sind folgende Ansätze denkbar (auch kombiniert):
 
-1. Die für die vollständige Ausladung notwendigen Informationen (neuer Board Key verschlüsselt für alle eingeladenen Nutzer) werden
-   an den Server geschickt, aber nicht sofort durchgesetzt. Der Server wählt einen geeigneten oder konfigurierten Zeitpunkt
+1. Die für die vollständige Ausladung notwendigen Informationen (neuer Board Key verschlüsselt für alle eingeladenen Nutzer:innen)
+   werden an den Server geschickt, aber nicht sofort durchgesetzt. Der Server wählt einen geeigneten oder konfigurierten Zeitpunkt
    (bspw. 18 Uhr), um die Anpassungen vollständig umzusetzen. Eine anschließende Einladung oder Ausladung weiterer Nutzer:innen
    muss dies berücksichtigen.
-2. Es wird das Konzept eines "maintenance users" ergänzt, welcher zum Board eingeladen wird. Dieser hat Zugriff auf Schlüsselmaterial,
-   insbesondere alle öffentlichen Schlüssel und die Board Keys. Der maintenance user führt die Board Key Rotation zu einem
+2. Es wird das Konzept eines "Maintenance Users" ergänzt, welcher zum Board eingeladen wird. Dieser hat Zugriff auf Schlüsselmaterial,
+   insbesondere alle öffentlichen Schlüssel und die Board Keys. Der Maintenance User führt die Board Key Rotation zu einem
    geeigneten oder konfigurierten Zeitpunkt aus und berücksichtigt alle Ausladungen (Einladungen funktionieren wie gehabt).
 
 Dies hat zur Folge, dass die ausgeladenen Nutzer:innen für einen bestimmten bzw. konfigurierbaren Zeitraum weiterhin

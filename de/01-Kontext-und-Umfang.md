@@ -81,8 +81,8 @@ geändert werden, dies hat allerdings weitreichende Folgen und erfordert teils s
 
 * Es werden keine besonderen Maßnahmen getroffen, um gegen einen aktiv angreifenden Applikationsserver zu verteidigen.
 * Es wird nicht die Vertraulichkeit und Integrität des gesamten Boards sichergestellt, sondern nur die Vertraulichkeit
-  aller einzelnen Post-it-Inhalte. Insbesondere betrifft dies die Metadaten von Post-its (Position, Größe, Farbe, Verknüpfungen, 
-  Version). Der Server kann also bspw. Post-its verschieben oder alte Post-its anzeigen.
+  aller einzelnen Post-it-Inhalte. Insbesondere werden die Metadaten von Post-its (Position, Größe, Farbe, Verknüpfungen, 
+  Version) nicht besonders geschützt. Der Server kann also bspw. Post-its verschieben oder alte Post-its anzeigen.
 * Keine Authentizität oder Deniability: Die eindeutige Urheberschaft eines Post-its muss nicht sichergestellt werden.
   * Nutzer:innen haben also keine Möglichkeit, eindeutig zu bestimmen oder abzustreiten, wer ein bestimmtes Post-it verfasst hat.
   * Nutzer:innen haben außerdem keine Möglichkeit, eindeutig zu bestimmen oder abzustreiten, wer einen bestimmten Board Key 
